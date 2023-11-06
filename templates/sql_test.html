@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Data Display</title>
+</head>
+<body>
+    <h1>Data from MySQL Database</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Car ID</th>
+                <th>Car Name</th>
+                <th>Car Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+                <tr>
+                    <td>{{ row[0] }}</td> <!-- Assuming the first column is the Car ID -->
+                    <td>{{ row[1] }}</td> <!-- Assuming the second column is the Car Name -->
+                    <td>{{ row[2] }}</td> <!-- Assuming the third column is the Car Price -->
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
