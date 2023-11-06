@@ -21,7 +21,7 @@
 
    
     <style>
-        .car-container {
+        .container {
             border: 1px solid #ccc;
             padding: 10px;
             margin: 10px;
@@ -29,16 +29,16 @@
             width: 200px;
         }
 
-        .car-container h2 {
+        .container h2 {
             font-size: 20px;
             margin: 0;
         }
 
-        .car-container p {
+        .container p {
             margin: 5px 0;
         }
 
-        .car-container img {
+        .container img {
             max-width: 100%;
             height: auto;
             margin-top: 10px;
@@ -82,12 +82,21 @@
       </section>
 
     <h1>Our Rental Cars</h1>
-    <div class="car-container">
-        {% for car in data %}
-            <div class="car-container">
-                <h2>{{car}}</h2>
-            </div>
-        {% endfor %}
+    <div class="container">
+        <div class="row">
+            {% for car in data %}
+                <div class="container">
+                    <div class="col-md-4">
+                        <div class="car-wrap rounded ftco-animate">
+                            <h2>{{car}}</h2>
+                        </div>
+                    </div>
+                </div>
+                <p class="d-flex mb-0 d-block"><a href="#" class="btn btn-primary py-2 mr-1">Book now</a> <a href="car-single.html" class="btn btn-secondary py-2 ml-1">Details</a></p>
+            {% endfor %}
+
+        </div>
+
     </div>
       <!-- loader -->
   <div id="ftco-loader" class="show fullscreen"><svg class="circular" width="48px" height="48px"><circle class="path-bg" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke="#eeeeee"/><circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke-miterlimit="10" stroke="#F96D00"/></svg></div>
