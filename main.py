@@ -25,18 +25,18 @@ def generate_document_id():
     unique_id = str(uuid.uuid4())
     return f"reviews-{unique_id}"
 
-@app.route('/')
-def display_reviews():
-    result = crud.get("reviews")
-    document_id = generate_document_id()
+# @app.route('/')
+# def display_reviews():
+#     result = crud.get("reviews")
+#     document_id = generate_document_id()
     
-    # Add a document to a collection with a specific ID
-    data = {"userID": 5432, "carID": 3333, "comments": "This car sucks", "ratings":4.5}
-    crud.add('reviews', data=data, document_id=document_id)
+#     # Add a document to a collection with a specific ID
+#     data = {"userID": 5432, "carID": 3333, "comments": "This car sucks", "ratings":4.5}
+#     crud.add('reviews', data=data, document_id=document_id)
     
-    return render_template('test.html', reviews=result)
+#     return render_template('test.html', reviews=result)
 
-@app.route('/select_all')
+@app.route('/')
 def select_all_from_table():
     try:
         cursor = mysql.get_db().cursor()
