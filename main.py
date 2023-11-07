@@ -20,6 +20,8 @@ app.config['MYSQL_DATABASE_PASSWORD'] = 'dbpassword'
 app.config['MYSQL_DATABASE_DB'] = 'inf2003'
 
 mysql.init_app(app)
+app.secret_key = 'secret'
+
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
