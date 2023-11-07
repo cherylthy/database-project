@@ -22,7 +22,15 @@ mysql.init_app(app)
 
 @app.route('/home')
 def select_all_from_table():
-  return render_template('homepage.html')
+    try:
+        cursor = mysql.get_db().cursor()
+        cursor.execute("SELECT CarMake, CarModel FROM CarInventory")
+        data = cursor.fetchall()
+        cursor.close()
+        return render_template('homepage.html', data=data)
+
+    except Exception as e:
+        return jsonify({'error': str(e)})
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
