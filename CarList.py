@@ -13,7 +13,7 @@ mysql = MySQL()
 
 # MySQL configuration
 app.config['MYSQL_DATABASE_HOST'] = '35.212.183.7'
-app.config['MYSQL_DATABASE_USER'] = 'khan'
+app.config['MYSQL_DATABASE_USER'] = 'samuel'
 app.config['MYSQL_DATABASE_PASSWORD'] = 'dbpassword'
 app.config['MYSQL_DATABASE_DB'] = 'inf2003'
 
@@ -33,4 +33,4 @@ def select_all_from_table():
         return jsonify({'error': str(e)})
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8080)
+    app.run(host="0.0.0.0", port=5000)
