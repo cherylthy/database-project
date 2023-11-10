@@ -143,12 +143,13 @@ def admin_login():
 
 @app.route('/admin_dashboard', methods=['GET', 'POST'])
 def admin_dashboard():
-    if 'admin_loggedin' in session and session['admin_loggedin']:
-        return render_template('admin_dashboard.html')
-    else:
-        abort(403)  # HTTP status code for forbidden access
+    cursor = mysql.get_db().cursor()
+    cursor.execute("SELECT `License Plates`, `Car Make`, `Car Model`, `Body Type` FROM CarInventory")
+    data = cursor.fetchall()
+    cursor.close()
+    return render_template('admin_dashboard.html', data=data)
 
-    return render_template('admin_login.html', msg=msg)
+
 
 
 @app.route('/account')
