@@ -4,6 +4,8 @@ from flaskext.mysql import MySQL
 import uuid
 import MySQLdb.cursors
 import MySQLdb.cursors, re, hashlib
+from functools import wraps
+from flask import abort
 
 app = Flask(__name__)
 
@@ -68,6 +70,7 @@ def logout():
    # Redirect to login page
    return redirect(url_for('login'))
 
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
 
@@ -99,12 +102,12 @@ def register():
             msg = 'Please fill out the form!'
         else:
             # Hash the password
-            hash = password + app.secret_key
-            hash = hashlib.sha1(hash.encode())
-            password = hash.hexdigest()
+           #hash = password + app.secret_key
+           # hash = hashlib.sha1(hash.encode())
+           # password = hash.hexdigest()
 
             # Account doesn't exist, and the form data is valid, so insert the new account into the UserAccounts table
-            cursor.execute('INSERT INTO UserAccounts VALUES (NULL, %s, %s, %s, %s, %s, NULL)', (password, name, age, phoneno, email))
+            cursor.execute('INSERT INTO UserAccounts VALUES (NULL, %s, %s, %s, %s, %s, NULL, NULL)', (password, name, age, phoneno, email))
             mysql.get_db().commit()
             msg = 'You have successfully registered!'
 
@@ -114,6 +117,38 @@ def register():
 
     return render_template('register.html', msg=msg)
 
+
+
+#ADMIN
+@app.route('/admin_login', methods=['GET', 'POST'])
+def admin_login():
+    msg = ''  # Output a message if something goes wrong...
+
+    if request.method == 'POST' and 'Email' in request.form and 'Password' in request.form:
+        email = request.form['Email']
+        password = request.form['Password']
+
+        # Check if the credentials belong to an admin
+        admin_cursor = mysql.get_db().cursor()
+        admin_cursor.execute('SELECT * FROM UserAccounts WHERE Email = %s AND Password = %s AND IsAdmin = 1', (email, password,))
+        admin_account = admin_cursor.fetchone()
+
+        if admin_account:
+            session['admin_loggedin'] = True
+            return redirect(url_for('admin_dashboard'))
+        else:
+            msg = 'Incorrect admin credentials!'
+
+    return render_template('admin_login.html', msg=msg)
+
+@app.route('/admin_dashboard', methods=['GET', 'POST'])
+def admin_dashboard():
+    if 'admin_loggedin' in session and session['admin_loggedin']:
+        return render_template('admin_dashboard.html')
+    else:
+        abort(403)  # HTTP status code for forbidden access
+
+    return render_template('admin_login.html', msg=msg)
 
 
 @app.route('/account')

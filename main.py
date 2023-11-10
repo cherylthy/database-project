@@ -4,6 +4,8 @@ from flaskext.mysql import MySQL
 import uuid
 import MySQLdb.cursors
 import MySQLdb.cursors, re, hashlib
+from functools import wraps
+from flask import abort
 
 app = Flask(__name__)
 
@@ -115,6 +117,9 @@ def register():
 
     return render_template('register.html', msg=msg)
 
+
+
+#ADMIN
 @app.route('/admin_login', methods=['GET', 'POST'])
 def admin_login():
     msg = ''  # Output a message if something goes wrong...
@@ -136,9 +141,14 @@ def admin_login():
 
     return render_template('admin_login.html', msg=msg)
 
-@app.route('/admin_dashboard',methods=['GET', 'POST'])
+@app.route('/admin_dashboard', methods=['GET', 'POST'])
 def admin_dashboard():
-    return render_template('admin_dashboard.html')
+    if 'admin_loggedin' in session and session['admin_loggedin']:
+        return render_template('admin_dashboard.html')
+    else:
+        abort(403)  # HTTP status code for forbidden access
+
+    return render_template('admin_login.html', msg=msg)
 
 
 @app.route('/account')
@@ -188,8 +198,4 @@ def update_account():
     
 
 if __name__ == "__main__":
-<<<<<<< Updated upstream
-    app.run(host="0.0.0.0", port=8080)
-=======
-    app.run(host="0.0.0.0", port=5000, debug=True)
->>>>>>> Stashed changes
+    app.run(host="0.0.0.0", port=5000)
