@@ -3,7 +3,9 @@ from firebase import Firebase
 from flaskext.mysql import MySQL
 import uuid
 import MySQLdb.cursors
+from flask_datepicker import datepicker
 import MySQLdb.cursors, re, hashlib
+from flask_debug import Debug
 from functools import wraps
 from flask import abort
 
@@ -26,7 +28,7 @@ app.config['MYSQL_DATABASE_DB'] = 'inf2003'
 
 mysql.init_app(app)
 app.secret_key = 'secret'
-
+Debug(app)
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -197,6 +199,139 @@ def update_account():
     except Exception as e:
         return jsonify({'error': str(e)})
     
+datepicker(app)
+
+@app.route('/carlist')
+def select_all_from_table():
+    try:
+        cursor = mysql.get_db().cursor()
+        cursor.execute("SELECT license_plate, car_make, car_model FROM CarInventory")
+        data = cursor.fetchall()
+        cursor.close()
+        return render_template('homepage.html', data=data)
+
+    except Exception as e:
+        return jsonify({'error': str(e)})
+    
+@app.route('/listing/<carId>')
+def display_car_details(carId):
+    try:
+        cursor = mysql.get_db().cursor()
+        cursor.execute("SELECT * FROM CarInventory WHERE license_plate = %s", (carId,))
+        data = cursor.fetchone()
+        cursor.close()
+        if data:
+            license_plate = data[0]
+            car_make = data[1]
+            car_model = data[2]
+            year = data[3]
+            body_type = data[4]
+            
+            return render_template('listing.html', license_plate=license_plate, car_make=car_make, car_model=car_model, year=year, body_type=body_type, carId=carId)
+
+    except Exception as e:
+        return jsonify({'error': str(e)})
+
+@app.route('/booking/<carId>')
+def booking_page(carId):
+    try:
+        cursor = mysql.get_db().cursor()
+        cursor.execute("SELECT * FROM CarInventory WHERE license_plate = %s", (carId,))
+        data = cursor.fetchone()
+        cursor.close()
+        if data:
+            license_plate = data[0]
+            car_make = data[1]
+            car_model = data[2]
+            year = data[3]
+            body_type = data[4]
+            
+            return render_template('booking.html', license_plate=license_plate, car_make=car_make, car_model=car_model, year=year, body_type=body_type, carId=carId)
+
+    except Exception as e:
+        return jsonify({'error': str(e)})
+    
+@app.route('/checkout', methods=['POST'])
+def pass_to_checkout():
+    try:
+        license_plate = request.form['licensePlate']
+        # start_date = request.form['startDate']
+        # end_date = request.form['endDate']
+        date_range = request.form['bookingDate']
+        date_range = date_range.split(" to ")
+        start_date = date_range[0]
+        end_date = date_range[1]
+        UserId = session['UserID']
+        
+        return render_template('checkout.html', license_plate=license_plate, start_date=start_date, end_date=end_date, UserId=UserId)
+    except Exception as e:
+        return jsonify({'error': str(e)})
+    
+def post_rental(UserId, PlateId, StartDate, EndDate):
+    try:
+        # UserId = session['UserID']
+        # PlateId = request.form['plateId']
+        # StartDate = request.form['start_date']
+        # EndDate = request.form['end_date']
+        
+        cursor = mysql.get_db().cursor()
+        cursor.execute('INSERT INTO Rentals VALUES (NULL, %s, %s, %s, %s)', (UserId, PlateId, StartDate, EndDate))
+        mysql.get_db().commit()
+        rentalId = cursor.lastrowid
+        cursor.close()
+        
+        return rentalId
+        # return jsonify({'rentalId': rentalId})
+    except Exception as e:
+        print(str(e))  # Print the error for debugging
+        return None
+    
+@app.route('/handle_booking', methods=['POST'])
+def handle_booking():
+    try:
+        UserId = session['UserID']
+        PlateId = request.form['licensePlate']
+        # StartDate = request.form['start_date']
+        # EndDate = request.form['end_date']
+        dateRange = request.form['bookingDate']
+        dateRange = dateRange.split(" to ")
+        StartDate = dateRange[0]
+        EndDate = dateRange[1]
+        # Check the payment type
+        # selected_payment_type = request.form['paymentType']
+
+        # if selected_payment_type == 'codForm':
+        #     # Show a confirmation popup for Cash on Delivery
+        #     # return render_template('confirmation_popup.html', UserId=UserId, PlateId=PlateId, StartDate=StartDate, EndDate=EndDate)
+        #     return jsonify({'message': 'Cash on delivery form submitted.'})
+
+        # elif selected_payment_type == 'ccForm':
+            # Insert rental information and redirect to rental page
+        rentalId = post_rental(UserId, PlateId, StartDate, EndDate)
+        if rentalId is not None:
+            # return redirect(url_for('load_rental', rentalId=rentalId))
+            return jsonify({'rentalId': rentalId})
+        else:
+            return jsonify({'error': 'Failed to insert rental information.'})
+            
+    except Exception as e:
+        return jsonify({'error': str(e)})
+    
+@app.route('/rental/<rentalId>')
+def load_rental(rentalId):
+    try:
+        cursor = mysql.get_db().cursor()
+        cursor.execute("SELECT * FROM Rentals WHERE RentalID = %s", (rentalId,))
+        data = cursor.fetchone()
+        cursor.close()
+        if data:
+            start_date = data[3]
+            end_date = data[4]
+            
+            return render_template('rental.html', start_date=start_date, end_date=end_date, rentalId=rentalId)
+
+    except Exception as e:
+        return jsonify({'error': str(e)})
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="localhost", port=5000, debug=True)

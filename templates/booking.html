@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Car Listing Page</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <link href="https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800&display=swap" rel="stylesheet">
+
+    <link rel= "stylesheet" type= "text/css" href= "https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800&display=swap">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/open-iconic-bootstrap.min.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/animate.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/owl.carousel.min.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/owl.theme.default.min.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/magnific-popup.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/aos.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/ionicons.min.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/bootstrap-datepicker.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/jquery.timepicker.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/flaticon.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/icomoon.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  </head>
+  <body>
+    <h1>Summary of Car Details</h1>
+    <p>Car ID: {{ license_plate }}</p>
+    <p>Car Make: {{ car_make }}</p>
+    <p>Car Model: {{ car_model }}</p>
+    <p>Year: {{ year }}</p>
+    <p>Body Type: {{ body_type }}</p>
+
+    <form id="dateForm" action="/checkout" method="POST" onsubmit="handleForm(event)">
+        <div>
+        <input type="hidden" id="licensePlate" name="licensePlate" value="{{license_plate}}">
+        <input type="hidden" id="paymentType" name="paymentType" value="">
+        <label for="bookingDate">Choose Date(s):</label>
+        <input type="text" id="bookingDate" name="bookingDate" placeholder="Please select date(s) for booking">
+        </div>
+        <br>
+        <h5 class="card-title">Payment Mode</h5>
+        <hr/>
+        <div class="form-check ms-3 mt-3">
+            <input class="form-check-input" type="radio" name="paymentRadio" id="creditCard" value="ccForm">
+            <label class="form-check-label" for="creditCard">
+            Credit Card
+            </label>
+        </div>
+        <div class="form-check ms-3 mt-3">
+            <input class="form-check-input" type="radio" name="paymentRadio" id="cashOnDelivery" value="codForm">
+            <label class="form-check-label" for="cashOnDelivery">
+            Cash on Delivery
+            </label>
+        </div>
+        <div>
+            <button class="btn btn-primary rounded-pill px-3 mb-2 mb-lg-0" type="submit">
+                <span class="d-flex align-items-center">
+                <i class="bi bi-calendar2-check me-2" required></i>
+                    <span class="small">Place Booking</span>
+                </span>
+            </button>
+        </div>
+    </form>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        flatpickr("#bookingDate", {
+        enableTime: false,
+        mode: "range",
+        minDate: "today",
+        dateFormat: "Y-m-d"
+        });
+
+        function handleForm(event) {
+            event.preventDefault();
+    
+            const selectedPaymentType = document.querySelector('input[name="paymentRadio"]:checked').value;
+            document.getElementById('paymentType').value = selectedPaymentType;
+            const formData = new FormData(document.getElementById('dateForm'));
+    
+            if (selectedPaymentType === 'codForm') {
+                const proceed = window.confirm('Proceed with Cash on Delivery?');
+                if (proceed) {
+                    // If the user clicks "OK," call the function to insert into the table and redirect
+                    fetch('/handle_booking', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json();
+                        } else {
+                            console.error('Error:', response.statusText);
+                            throw new Error('Failed to handle booking');
+                        }
+                    })
+                    .then(data => {
+                        // Redirect to the received rentalId
+                        const rentalId = data.rentalId;
+                        window.location.href = `/rental/${rentalId}`;
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                } else {
+                    // If the user clicks "Cancel," do nothing or handle accordingly
+                }
+            } else if (selectedPaymentType === 'ccForm') {
+                document.getElementById('dateForm').submit();
+            } else {
+                alert('Please select a payment type.');
+            }
+        }
+        function performCOD(formData) {
+            handle_booking(formData)
+        }
+    </script>
+    
+
+</body>
+</html>

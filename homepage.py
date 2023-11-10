@@ -24,7 +24,7 @@ mysql.init_app(app)
 def select_all_from_table():
     try:
         cursor = mysql.get_db().cursor()
-        cursor.execute("SELECT CarMake, CarModel FROM CarInventory")
+        cursor.execute("SELECT car_make, car_model FROM CarInventory")
         data = cursor.fetchall()
         cursor.close()
         return render_template('homepage.html', data=data)

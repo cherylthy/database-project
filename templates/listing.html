@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Car Listing Page</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <link href="https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800&display=swap" rel="stylesheet">
+
+    <link rel= "stylesheet" type= "text/css" href= "https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800&display=swap">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/open-iconic-bootstrap.min.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/animate.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/owl.carousel.min.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/owl.theme.default.min.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/magnific-popup.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/aos.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/ionicons.min.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/bootstrap-datepicker.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/jquery.timepicker.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/flaticon.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/icomoon.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  </head>
+  <body>
+    <h1>Car Details</h1>
+    <p>Car ID: {{ license_plate }}</p>
+    <p>Car Make: {{ car_make }}</p>
+    <p>Car Model: {{ car_model }}</p>
+    <p>Year: {{ year }}</p>
+    <p>Body Type: {{ body_type }}</p>
+
+    <form id="dateForm" action="/checkout" method="POST">
+      <div>
+        <input type="hidden" id="licensePlate" name="licensePlate" value="{{license_plate}}">
+        <label for="bookingDate">Date:</label>
+        <input type="text" id="startDate" name="startDate" placeholder="Please select start date">
+        <input type="text" id="endDate" name="endDate" placeholder="Please select end date">
+      </div>
+      <br>
+      <div>
+          <button class="btn btn-primary rounded-pill px-3 mb-2 mb-lg-0" type="submit">
+              <span class="d-flex align-items-center">
+              <i class="bi bi-calendar2-check me-2" required></i>
+                  <span class="small">Book</span>
+              </span>
+          </button>
+      </div>
+    </form>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+      flatpickr("#startDate", {
+        enableTime: false,
+        dateFormat: "Y-m-d"
+      });
+      flatpickr("#endDate", {
+        enableTime: false,
+        dateFormat: "Y-m-d"
+      });
+    </script>
+
+</body>
+</html>

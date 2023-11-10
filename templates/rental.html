@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Data Display</title>
+</head>
+<body>
+    <h1>Data from MySQL Database</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Rental ID</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+            </tr>
+        </thead>
+        <tbody>
+                <tr>
+                    <td>{{ rental_id }}</td> <!-- Assuming the first column is the Car ID -->
+                    <td>{{ start_date }}</td> <!-- Assuming the second column is the Car Name -->
+                    <td>{{ end_date }}</td> <!-- Assuming the third column is the Car Price -->
+                </tr>
+        </tbody>
+    </table>
+</body>
+</html>
