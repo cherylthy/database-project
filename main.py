@@ -10,6 +10,9 @@ app = Flask(__name__)
 # Initialize Firebase
 crud = Firebase()
 
+# Change this to your secret key (it can be anything, it's for extra protection)
+app.secret_key = 'your secret key'
+
 # Initialize MySQL
 mysql = MySQL()
 
@@ -105,6 +108,19 @@ def register():
         msg = 'Please fill out the form!'
 
     return render_template('register.html', msg=msg)
+
+@app.route('/account')
+def accounts():
+    try:
+        cursor = mysql.get_db().cursor()
+        cursor.execute("SELECT * FROM UserAccounts")
+        data = cursor.fetchall()
+        cursor.close()
+        return render_template('accounts_page.html', data=data)
+    
+    except Exception as e:
+        return jsonify({'error': str(e)})
+    
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
