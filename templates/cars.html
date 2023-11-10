@@ -53,25 +53,35 @@
         </div>
       </div>
     </section>
-		<form method="get" action="{{ url_for('select_all_from_table') }}">
+
+    <!-- Filter and Sort Button -->
+    <form method="get" action="{{ url_for('select_all_from_table') }}">
       <label for="make">Filter by Make:</label>
-      <input type="text" name="make" id="make">
-  
+      <select name="make" id="make">
+          <option value="">All Makes</option>
+            {% for make in car_makes %}
+              <option value="{{ make }}">{{ make }}</option>
+            {% endfor %}
+      </select>
+
       <label for="sort_by">Sort by:</label>
       <select name="sort_by" id="sort_by">
           <option value="car_make">Make</option>
           <option value="car_model">Model</option>
           <option value="price">Price</option>
       </select>
-  
+
       <label for="sort_order">Sort order:</label>
-      <select name="sort_order" id="sort_order">
-          <option value="asc">Ascending</option>
-          <option value="desc">Descending</option>
-      </select>
-  
+        <select name="sort_order" id="sort_order">
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
+        </select>
+
       <button type="submit">Apply</button>
     </form>
+
+
+    <!-- Dynamic Car Listing section -->
 
 		<section class="ftco-section bg-light">
       <div class="container">
@@ -94,6 +104,8 @@
           </div>
       </div>
   </section>
+
+  <!-- Dynamic Pagination -->
   <div class="row mt-5">
     <div class="col text-center">
         <div class="block-27">
@@ -114,6 +126,7 @@
     </div>
   </div>
 
+  <!-- Footer -->
     <footer class="ftco-footer ftco-bg-dark ftco-section">
       <div class="container">
         <div class="row mb-5">

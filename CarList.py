@@ -37,12 +37,11 @@ def calculate_total_pages(total_rows, per_page):
 @app.route('/CarList')
 def select_all_from_table():
     try:
-        # Get distinct car makes for the filter dropdown
+        # Fetch distinct car makes for the dropdown
         cursor = mysql.get_db().cursor()
         cursor.execute("SELECT DISTINCT car_make FROM CarInventory")
-        car_makes = [row[0] for row in cursor.fetchall()]
-        cursor.close()
-
+        car_makes = [make[0] for make in cursor.fetchall()]
+        
         # Get filtering and sorting parameters from the request
         make_filter = request.args.get('make', default=None, type=str)
         sort_by = request.args.get('sort_by', default='car_make', type=str)
@@ -56,6 +55,7 @@ def select_all_from_table():
         # Build the SQL query based on filtering and sorting parameters
         query = "SELECT car_make, car_model, price FROM CarInventory"
 
+        # Check if there's a make_filter parameter
         if make_filter:
             query += f" WHERE car_make = '{make_filter}'"
 
@@ -68,6 +68,8 @@ def select_all_from_table():
 
         # Get total count for pagination
         total_query = "SELECT COUNT(*) FROM CarInventory"
+
+        # Check if there's a make_filter parameter
         if make_filter:
             total_query += f" WHERE car_make = '{make_filter}'"
 
@@ -78,11 +80,11 @@ def select_all_from_table():
 
         total_pages = (total_items // items_per_page) + (1 if total_items % items_per_page > 0 else 0)
 
-        return render_template('cars.html', data=data, car_makes=car_makes, current_page=page, total_pages=total_pages)
+        return render_template('cars.html', data=data, current_page=page, total_pages=total_pages, car_makes=car_makes)
 
     except Exception as e:
         return jsonify({'error': str(e)})
-    
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
