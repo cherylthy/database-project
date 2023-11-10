@@ -23,6 +23,8 @@ app.config['MYSQL_DATABASE_PASSWORD'] = 'dbpassword'
 app.config['MYSQL_DATABASE_DB'] = 'inf2003'
 
 mysql.init_app(app)
+app.secret_key = 'secret'
+
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -73,12 +75,15 @@ def register():
     msg = ''
 
     # Check if "username", "password" and "email" POST requests exist (user submitted form)
-    if request.method == 'POST' and 'Name' in request.form and 'Password' in request.form and 'Email' in request.form:
+    if request.method == 'POST' and 'Name' in request.form and 'Password' in request.form and 'Age' in request.form and 'PhoneNo' in request.form and 'Email' in request.form:
 
         #Check for if account used to register exist in database
         name = request.form['Name']
         password = request.form['Password']
+        age = request.form['Age']
+        phoneno = request.form['PhoneNo']
         email = request.form['Email']
+
         cursor = mysql.get_db().cursor()
         cursor.execute('SELECT * FROM UserAccounts WHERE Email = %s', (email,))
         account = cursor.fetchone()
@@ -99,7 +104,7 @@ def register():
             password = hash.hexdigest()
 
             # Account doesn't exist, and the form data is valid, so insert the new account into the UserAccounts table
-            cursor.execute('INSERT INTO UserAccounts VALUES (NULL, %s, %s, NULL, NULL, %s, NULL)', (password, name, email,))
+            cursor.execute('INSERT INTO UserAccounts VALUES (NULL, %s, %s, %s, %s, %s, NULL)', (password, name, age, phoneno, email))
             mysql.get_db().commit()
             msg = 'You have successfully registered!'
 
