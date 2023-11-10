@@ -324,3 +324,33 @@
 
 })(jQuery);
 
+// For accounts page
+function openNav() {
+	document.getElementById("mySidenav").style.width = "225px";
+  }
+  
+  /* Set the width of the side navigation to 0 */
+  function closeNav() {
+	document.getElementById("mySidenav").style.width = "0";
+  }
+
+  function toggleEditForm() {
+    var editForm = document.getElementById("editForm");
+    var userInfo = document.getElementById("account-information");
+    var userName = document.getElementById("userName");
+    var userEmail = document.getElementById("userEmail");
+    var editButton = document.getElementById("editButton");
+
+    if (editForm.style.display === "none") {
+        editForm.style.display = "block";
+        userInfo.style.display = "none";
+        editButton.textContent = "Cancel";
+        // Populate the form fields with existing user data
+        document.getElementById("name").value = userName.textContent;
+        document.getElementById("email").value = userEmail.textContent;
+    } else {
+        editForm.style.display = "none";
+        userInfo.style.display = "block";
+        editButton.textContent = "Edit";
+    }
+}

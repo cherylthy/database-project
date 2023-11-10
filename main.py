@@ -117,12 +117,45 @@ def register():
 @app.route('/account')
 def accounts():
     try:
+        # Check if the user is logged in
+        if 'UserID' not in session:
+            return jsonify({'error': 'User not logged in'})
+
+        user_id = session['UserID']
+
         cursor = mysql.get_db().cursor()
-        cursor.execute("SELECT * FROM UserAccounts")
+        # Fetch data only for the logged-in user
+        cursor.execute("SELECT * FROM UserAccounts WHERE UserID = %s", (user_id,))
         data = cursor.fetchall()
         cursor.close()
+        
+        # Check if user exists
+        if not data:
+            return jsonify({'error': 'User not found'})
+
         return render_template('accounts_page.html', data=data)
     
+    except Exception as e:
+        return jsonify({'error': str(e)})
+
+@app.route('/update', methods=['POST'])
+def update_account():
+    try:
+        if 'UserID' in session:
+            user_id = session['UserID']
+            new_name = request.form.get('name')
+            new_email = request.form.get('email')
+            new_password = request.form.get('password')
+            
+            # Update the user information in the database using SQL UPDATE statement
+            cursor = mysql.get_db().cursor()
+            cursor.execute("UPDATE UserAccounts SET Name=%s, Email=%s, Password=%s WHERE UserID=%s",
+                           (new_name, new_email, new_password, user_id))
+            mysql.get_db().commit()
+            cursor.close()
+            
+            return redirect('/account')  # Redirect to account page after successful update
+            
     except Exception as e:
         return jsonify({'error': str(e)})
     
