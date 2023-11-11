@@ -53,7 +53,7 @@ def select_all_from_table():
         offset = (page - 1) * items_per_page
 
         # Build the SQL query based on filtering and sorting parameters
-        query = "SELECT car_make, car_model, price FROM CarInventory"
+        query = "SELECT car_make, car_model, daily_rate FROM CarInventory"
 
         # Check if there's a make_filter parameter
         if make_filter:

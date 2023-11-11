@@ -32,35 +32,85 @@ Debug(app)
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
-
     # Output a message if something goes wrong...
     msg = ''
 
     # Check if "username" and "password" POST requests exist (user submitted form)
     if request.method == 'POST' and 'Email' in request.form and 'Password' in request.form:
-
-        # Check if email and password exist in database
+        # Check if email and password exist in the database
         email = request.form['Email']
         password = request.form['Password']
         cursor = mysql.get_db().cursor()
         cursor.execute('SELECT * FROM UserAccounts WHERE Email = %s AND Password = %s', (email, password,))
         account = cursor.fetchone()
 
-        # If account exists in accounts table in out database
+        # If account exists in the accounts table in your database
         if account:
             session['loggedin'] = True
             session['UserID'] = account[0]
             session['Email'] = account[1]
 
-            return 'Logged in successfully!'
-        
+            # Redirect the user to the "CarList" page after successful login
+            return redirect(url_for('select_all_from_table'))
+
         else:
-            # Account doesnt exist or username/password incorrect
+            # Account doesn't exist or username/password is incorrect
             msg = 'Incorrect username/password!'
 
-    # Show the login form with message (if any)
+    # Show the login form with a message (if any)
     return render_template('login.html', msg=msg)
 
+@app.route('/CarList')
+def select_all_from_table():
+    try:
+        # Fetch distinct car makes for the dropdown
+        cursor = mysql.get_db().cursor()
+        cursor.execute("SELECT DISTINCT car_make FROM CarInventory")
+        car_makes = [make[0] for make in cursor.fetchall()]
+        
+        # Get filtering and sorting parameters from the request
+        make_filter = request.args.get('make', default=None, type=str)
+        sort_by = request.args.get('sort_by', default='car_make', type=str)
+        sort_order = request.args.get('sort_order', default='asc', type=str)
+        page = request.args.get('page', default=1, type=int)
+
+        # Pagination settings
+        items_per_page = 15  # Adjust this based on your preference
+        offset = (page - 1) * items_per_page
+
+        # Build the SQL query based on filtering and sorting parameters
+        query = "SELECT car_make, car_model, daily_rate FROM CarInventory"
+
+        # Check if there's a make_filter parameter
+        if make_filter:
+            query += f" WHERE car_make = '{make_filter}'"
+
+        query += f" ORDER BY {sort_by} {sort_order} LIMIT {offset}, {items_per_page}"
+
+        cursor = mysql.get_db().cursor()
+        cursor.execute(query)
+        data = cursor.fetchall()
+        cursor.close()
+
+        # Get total count for pagination
+        total_query = "SELECT COUNT(*) FROM CarInventory"
+
+        # Check if there's a make_filter parameter
+        if make_filter:
+            total_query += f" WHERE car_make = '{make_filter}'"
+
+        cursor = mysql.get_db().cursor()
+        cursor.execute(total_query)
+        total_items = cursor.fetchone()[0]
+        cursor.close()
+
+        total_pages = (total_items // items_per_page) + (1 if total_items % items_per_page > 0 else 0)
+
+        return render_template('CarList.html', data=data, current_page=page, total_pages=total_pages, car_makes=car_makes)
+    
+    except Exception as e:
+        return jsonify({'error': str(e)})
+    
 @app.route('/logout')
 def logout():
    
@@ -152,8 +202,6 @@ def admin_dashboard():
     return render_template('admin_dashboard.html', data=data)
 
 
-
-
 @app.route('/account')
 def accounts():
     try:
@@ -181,7 +229,7 @@ def accounts():
 @app.route('/update', methods=['POST'])
 def update_account():
     try:
-        if 'UserID' in session:
+         if 'UserID' in session:
             user_id = session['UserID']
             new_name = request.form.get('name')
             new_email = request.form.get('email')
@@ -190,7 +238,7 @@ def update_account():
             # Update the user information in the database using SQL UPDATE statement
             cursor = mysql.get_db().cursor()
             cursor.execute("UPDATE UserAccounts SET Name=%s, Email=%s, Password=%s WHERE UserID=%s",
-                           (new_name, new_email, new_password, user_id))
+                            (new_name, new_email, new_password, user_id))
             mysql.get_db().commit()
             cursor.close()
             
@@ -199,19 +247,69 @@ def update_account():
     except Exception as e:
         return jsonify({'error': str(e)})
     
+@app.route('/delete-account', methods=['POST'])
+def delete_account():
+    if 'UserID' not in session:
+        return jsonify({'error': 'User not logged in'})
+    
+    user_id = session['UserID']
+    cursor = mysql.get_db().cursor()
+    cursor.execute("DELETE FROM UserAccounts WHERE UserID = %s", (user_id ))
+    mysql.get_db().commit()
+    cursor.close()
+
+    return redirect('/login')
+
+@app.route('/bookings-overview')
+def bookings():
+    # Check if the user is logged in
+    if 'UserID' not in session:
+        return jsonify({'error': 'User not logged in'})
+    user_id = session['UserID']
+    cursor = mysql.get_db().cursor()
+    # Fetch data only for the logged-in user
+    cursor.execute("SELECT * FROM Rentals WHERE UserID = %s", (user_id))
+    data = cursor.fetchall()
+    cursor.close()
+    if data:
+        session['RentalID'] = data[0][0]  # Store the RentalID from the first row of the data
+    # Check if user exists
+    if not data:
+        return jsonify({'error': 'User not found'})
+    return render_template('user_bookings_overview.html', data=data)
+
+@app.route('/booking-individual')
+def individual_booking():
+    if 'UserID' not in session:
+        return jsonify({'error': 'User not logged in'})
+    if 'RentalID' not in session:
+        return jsonify({'error': 'Rental ID not found in session'})
+    print(session['RentalID'])
+    rental_id = session['RentalID']
+    cursor = mysql.get_db().cursor()
+    # Fetch data only for the logged-in user
+    cursor.execute("SELECT * FROM Rentals WHERE RentalID = %s", (rental_id))
+    data = cursor.fetchall()
+    cursor.close()
+    # Check if user exists
+    if not data:
+        return jsonify({'error': 'User not found'})
+    return render_template('user_individual_booking.html', data=data)
+
+@app.route('/cancel-booking', methods=['POST'])
+def cancel_booking():
+    if 'UserID' not in session:
+        return jsonify({'error': 'User not logged in'})
+    user_id = session['UserID']
+    booking_id = request.form.get('booking_id')
+    cursor = mysql.get_db().cursor()
+    cursor.execute("DELETE FROM Rentals WHERE UserID = %s AND RentalID = %s", (user_id, booking_id))
+    mysql.get_db().commit()
+    cursor.close()
+    return redirect('/bookings-overview')
+
 datepicker(app)
 
-@app.route('/carlist')
-def select_all_from_table():
-    try:
-        cursor = mysql.get_db().cursor()
-        cursor.execute("SELECT license_plate, car_make, car_model FROM CarInventory")
-        data = cursor.fetchall()
-        cursor.close()
-        return render_template('homepage.html', data=data)
-
-    except Exception as e:
-        return jsonify({'error': str(e)})
     
 @app.route('/listing/<carId>')
 def display_car_details(carId):
@@ -334,4 +432,4 @@ def load_rental(rentalId):
         return jsonify({'error': str(e)})
 
 if __name__ == "__main__":
-    app.run(host="localhost", port=5000, debug=True)
+    app.run(host="localhost", port=5000)

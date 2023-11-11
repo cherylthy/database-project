@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View All Bookings</title>
+</head>
+<body>
+    <h1>View All Bookings</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Booking ID</th>
+                <th>Customer Name</th>
+                <th>Booking Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for booking in data %}
+                <tr>
+                    <td>{{ booking[0] }}</td>
+                    <td><a href="/booking-individual">View Details</a></td>
+                    <td>{{ booking[1] }}</td>
+                    <td>{{ booking[3] }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
