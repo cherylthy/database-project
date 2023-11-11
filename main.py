@@ -79,7 +79,7 @@ def select_all_from_table():
         offset = (page - 1) * items_per_page
 
         # Build the SQL query based on filtering and sorting parameters
-        query = "SELECT car_make, car_model, daily_rate FROM CarInventory"
+        query = "SELECT license_plate, car_make, car_model, daily_rate FROM CarInventory"
 
         # Check if there's a make_filter parameter
         if make_filter:
@@ -309,7 +309,6 @@ def cancel_booking():
     return redirect('/bookings-overview')
 
 datepicker(app)
-
     
 @app.route('/listing/<carId>')
 def display_car_details(carId):
@@ -389,8 +388,8 @@ def handle_booking():
     try:
         UserId = session['UserID']
         PlateId = request.form['licensePlate']
-        # StartDate = request.form['start_date']
-        # EndDate = request.form['end_date']
+        # StartDate = request.form['startDate']
+        # EndDate = request.form['endDate']
         dateRange = request.form['bookingDate']
         dateRange = dateRange.split(" to ")
         StartDate = dateRange[0]
@@ -454,4 +453,4 @@ def add_listing():
     return render_template('listings.html', message='You have successfully listed a car!')
 
 if __name__ == "__main__":
-    app.run(host="localhost", port=5000)
+    app.run(host="localhost", port=5000, debug=True)
