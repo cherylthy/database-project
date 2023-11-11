@@ -47,16 +47,17 @@
                                     <div class="form-inline">
                                         <div class="mb-3 col-lg-5">
                                             <label for="expirationInput" class="form-label" class="form-label">Expiration Date (MM/YY)</label><br>
-                                            <input class="form-control ccForm" type="tel" minlength="2" maxlength="2" size="2" placeholder="MM" pattern="^[0-9]*$" title="Please enter the month of expiry" required> / <input class="form-control ccForm" type="tel" minlength="2" maxlength="2" size="2" placeholder="YY" pattern="^[0-9]*$" title="Please enter the year of expiry (Last two digit)">
+                                            <input class="form-control ccForm" type="tel" minlength="2" maxlength="2" size="2" placeholder="MM" pattern="^[0-9]*$" title="Please enter the month of expiry"> / <input class="form-control ccForm" type="tel" minlength="2" maxlength="2" size="2" placeholder="YY" pattern="^[0-9]*$" title="Please enter the year of expiry (Last two digit)">
                                         </div>
                                         <div class="mb-3 col-lg-5">
                                             <label for="verificationInput" class="form-label" class="form-label">Card Verification Number (CVV)</label><br>   
                                             <input class="form-control ccForm" type="tel" minlength="3" maxlength="3" size="3" placeholder="CVC" pattern="^[0-9]*$" title="Please enter the credit card verficiation number">
                                         </div>
                                     </div>
-                                    <input type="hidden" name="licensePlate" id="licensePlate" value="{{ license_plate }}">
-                                    <input type="hidden" name="bookingDate" id="bookingDate" value="{{ start_date }} to {{ end_date}}">
-                                    <input type="hidden" name="endDate" id="endDate" value="{{ end_date }}">    
+                                    <input type="hidden" name="license_plate" id="license_plate" value="{{ license_plate }}">
+                                    <input type="hidden" name="booking_date" id="booking_date" value="{{ start_date }} to {{ end_date }}">
+                                    <input type="hidden" name="start_date" id="start_date" value="{{ start_date }}">
+                                    <input type="hidden" name="end_date" id="end_date" value="{{ end_date }}">
                                 </form>
                             </div>
                         </div>
@@ -73,7 +74,7 @@
                                             <p class="card-text">{{ license_plate }}</p>
                                             <p class="card-text">{{ start_date }}</p>
                                             <p class="card-text">{{ end_date }}</p>
-                                            <p class="card-text">{{ UserId }}</p>
+                                            <p class="card-text">{{ user_id }}</p>
                                             <p class="card-text lead fs-6">S$XXX</p>
                                         </div>
                                         <br>
@@ -106,7 +107,7 @@
             })
             .then(data => {
                 // Redirect to the received rentalId
-                const rentalId = data.rentalId;
+                const rentalId = data.rental_id;
                 window.location.href = `/rental/${rentalId}`;
             })
             .catch(error => {

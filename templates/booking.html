@@ -33,10 +33,10 @@
 
     <form id="dateForm" action="/checkout" method="POST" onsubmit="handleForm(event)">
         <div>
-        <input type="hidden" id="licensePlate" name="licensePlate" value="{{license_plate}}">
+            <input type="hidden" name="license_plate" id="license_plate" value="{{ license_plate }}">
         <input type="hidden" id="paymentType" name="paymentType" value="">
-        <label for="bookingDate">Choose Date(s):</label>
-        <input type="text" id="bookingDate" name="bookingDate" placeholder="Please select date(s) for booking">
+        <label for="booking_date">Choose Date(s):</label>
+        <input type="text" id="booking_date" name="booking_date" placeholder="Please select date(s) for booking">
         </div>
         <br>
         <h5 class="card-title">Payment Mode</h5>
@@ -65,7 +65,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
-        flatpickr("#bookingDate", {
+        flatpickr("#booking_date", {
         enableTime: false,
         mode: "range",
         minDate: "today",
@@ -97,7 +97,7 @@
                     })
                     .then(data => {
                         // Redirect to the received rentalId
-                        const rentalId = data.rentalId;
+                        const rentalId = data.rental_id;
                         window.location.href = `/rental/${rentalId}`;
                     })
                     .catch(error => {
@@ -111,9 +111,6 @@
             } else {
                 alert('Please select a payment type.');
             }
-        }
-        function performCOD(formData) {
-            handle_booking(formData)
         }
     </script>
     

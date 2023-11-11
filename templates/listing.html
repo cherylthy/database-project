@@ -9,6 +9,7 @@
 
     <link rel= "stylesheet" type= "text/css" href= "https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800&display=swap">
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/open-iconic-bootstrap.min.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/bootstrap.min.css') }}">
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/animate.css') }}">
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/owl.carousel.min.css') }}">
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/owl.theme.default.min.css') }}">
@@ -20,46 +21,125 @@
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/flaticon.css') }}">
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/icomoon.css') }}">
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <style>
+      .book_float{
+        position: fixed;
+        bottom: 40px;
+        right: 40px;
+        background-color: #1089ff;
+        color: #FFF;
+        border-radius: 25px; /* Adjust the border-radius as needed */
+        padding: 10px; /* Add padding for better appearance */
+        text-align: center;
+        box-shadow: 2px 2px 3px #999;
+        text-decoration: none; /* Remove default underline */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 999;
+      }
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+      .book_float:hover {
+        // background-color: #1189ff; /* Change color on hover if desired */
+      }
+
+
+    </style>
+
   </head>
   <body>
-    <h1>Car Details</h1>
-    <p>Car ID: {{ license_plate }}</p>
-    <p>Car Make: {{ car_make }}</p>
-    <p>Car Model: {{ car_model }}</p>
-    <p>Year: {{ year }}</p>
-    <p>Body Type: {{ body_type }}</p>
+    <a href="/booking/{{ license_plate }}" class="book_float">
+      Book Now!
+    </a>
 
-    <form id="dateForm" action="/checkout" method="POST">
-      <div>
-        <input type="hidden" id="licensePlate" name="licensePlate" value="{{license_plate}}">
-        <label for="bookingDate">Date:</label>
-        <input type="text" id="startDate" name="startDate" placeholder="Please select start date">
-        <input type="text" id="endDate" name="endDate" placeholder="Please select end date">
+		<section class="ftco-section ftco-car-details">
+      <div class="container">
+      	<div class="row justify-content-center">
+      		<div class="col-md-12">
+      			<div class="car-details">
+      				<p class="img rounded" style="background-image: url('{{ url_for('static', filename='assets/bg_1.jpg') }}');"></p>
+      				<div class="text text-center">
+      					<span class="subheading">{{ car_make }}</span>
+      					<h2>{{ car_model }}</h2>
+      				</div>
+      			</div>
+      		</div>
+      	</div>
+      	<div class="row">
+      		<div class="col-md d-flex align-self-stretch">
+            <div class="media block-6 services">
+              <div class="media-body py-md-4">
+              	<div class="d-flex mb-3 align-items-center">
+	              	<div class="icon d-flex align-items-center justify-content-center"><span class="flaticon-rent"></span></div>
+	              	<div class="text">
+		                <h3 class="heading mb-0 pl-3">
+		                	Body Type
+		                	<span>{{ body_type }}</span>
+		                </h3>
+	                </div>
+                </div>
+              </div>
+            </div>      
+          </div>
+          <div class="col-md d-flex align-self-stretch">
+            <div class="media block-6 services">
+              <div class="media-body py-md-4">
+              	<div class="d-flex mb-3 align-items-center">
+	              	<div class="icon d-flex align-items-center justify-content-center"><span class="flaticon-pistons"></span></div>
+	              	<div class="text">
+		                <h3 class="heading mb-0 pl-3">
+		                	Transmission
+		                	<span>{{ transmission_type }}</span>
+		                </h3>
+	                </div>
+                </div>
+              </div>
+            </div>      
+          </div>
+          <div class="col-md d-flex align-self-stretch">
+            <div class="media block-6 services">
+              <div class="media-body py-md-4">
+              	<div class="d-flex mb-3 align-items-center">
+	              	<div class="icon d-flex align-items-center justify-content-center"><span class="flaticon-car-seat"></span></div>
+	              	<div class="text">
+		                <h3 class="heading mb-0 pl-3">
+		                	Seats
+		                	<span>5 Adults</span>
+		                </h3>
+	                </div>
+                </div>
+              </div>
+            </div>      
+          </div>
+      	</div>
+      	<div class="row">
+      		<div class="col-md-6">
+
+		      </div>
+          <div class="col-md-6 align-items-center justify-content-center">
+              <div class="row justify-content-center">
+                <ul style="list-style-type: none; padding: 30px">
+                  <li style="background-color: #1089ff; color: white; font-size: 50px; padding: 10px 50px">S${{ price }}</li>
+                  <li style="background-color: white; color: #1089ff; border: 1px solid #1089ff; font-size: 25px; padding: 5px; text-align: center;">per day</li>
+                </ul>
+              </div>
+              <div class="row justify-content-center dropdown">
+                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  View other colours available:
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                  {% for color in colors %}
+                  <a class="dropdown-item" href="/listing/{{color[1]}}">{{color[0]}}</a>
+                  {% endfor %}
+                </div>
+              </div>
+          </div>
+				</div>
       </div>
-      <br>
-      <div>
-          <button class="btn btn-primary rounded-pill px-3 mb-2 mb-lg-0" type="submit">
-              <span class="d-flex align-items-center">
-              <i class="bi bi-calendar2-check me-2" required></i>
-                  <span class="small">Book</span>
-              </span>
-          </button>
-      </div>
-    </form>
-
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script>
-      flatpickr("#startDate", {
-        enableTime: false,
-        dateFormat: "Y-m-d"
-      });
-      flatpickr("#endDate", {
-        enableTime: false,
-        dateFormat: "Y-m-d"
-      });
-    </script>
-
+    </section>
 </body>
+
 </html>
