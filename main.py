@@ -260,7 +260,7 @@ def bookings():
     user_id = session['UserID']
     cursor = mysql.get_db().cursor()
     # Fetch data only for the logged-in user
-    cursor.execute("SELECT * FROM Rentals WHERE UserID = %s", (user_id))
+    cursor.execute("SELECT DISTINCT * FROM CarInventory INNER JOIN Rentals ON CarInventory.license_plate = Rentals.PlateID WHERE Rentals.UserID =  %s LIMIT 5", (user_id))
     data = cursor.fetchall()
     cursor.close()
     if data:
