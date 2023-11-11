@@ -80,7 +80,7 @@ def select_all_from_table():
 
         total_pages = (total_items // items_per_page) + (1 if total_items % items_per_page > 0 else 0)
 
-        return render_template('cars.html', data=data, current_page=page, total_pages=total_pages, car_makes=car_makes)
+        return render_template('CarList.html', data=data, current_page=page, total_pages=total_pages, car_makes=car_makes)
 
     except Exception as e:
         return jsonify({'error': str(e)})
