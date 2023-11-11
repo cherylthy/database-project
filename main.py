@@ -495,4 +495,4 @@ def delete_car_inventory(selected_rows):
     mysql.get_db().commit()
     
 if __name__ == "__main__":
-    app.run(host="localhost", port=5000)
+    app.run(host="localhost", port=5000, debug=True)
