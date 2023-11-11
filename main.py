@@ -31,37 +31,7 @@ mysql.init_app(app)
 app.secret_key = 'secret'
 Debug(app)
 
-@app.route('/', methods=['GET', 'POST'])
-def login():
-    # Output a message if something goes wrong...
-    msg = ''
-
-    # Check if "username" and "password" POST requests exist (user submitted form)
-    if request.method == 'POST' and 'Email' in request.form and 'Password' in request.form:
-        # Check if email and password exist in the database
-        email = request.form['Email']
-        password = request.form['Password']
-        cursor = mysql.get_db().cursor()
-        cursor.execute('SELECT * FROM UserAccounts WHERE Email = %s AND Password = %s', (email, password,))
-        account = cursor.fetchone()
-
-        # If account exists in the accounts table in your database
-        if account:
-            session['loggedin'] = True
-            session['UserID'] = account[0]
-            session['Email'] = account[1]
-
-            # Redirect the user to the "CarList" page after successful login
-            return redirect(url_for('select_all_from_table'))
-
-        else:
-            # Account doesn't exist or username/password is incorrect
-            msg = 'Incorrect username/password!'
-
-    # Show the login form with a message (if any)
-    return render_template('login.html', msg=msg)
-
-@app.route('/CarList')
+@app.route('/')
 def select_all_from_table():
     try:
         # Fetch distinct car makes for the dropdown
@@ -111,6 +81,39 @@ def select_all_from_table():
     
     except Exception as e:
         return jsonify({'error': str(e)})
+    
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    # Output a message if something goes wrong...
+    msg = ''
+
+    # Check if "username" and "password" POST requests exist (user submitted form)
+    if request.method == 'POST' and 'Email' in request.form and 'Password' in request.form:
+        # Check if email and password exist in the database
+        email = request.form['Email']
+        password = request.form['Password']
+        cursor = mysql.get_db().cursor()
+        cursor.execute('SELECT * FROM UserAccounts WHERE Email = %s AND Password = %s', (email, password,))
+        account = cursor.fetchone()
+
+        # If account exists in the accounts table in your database
+        if account:
+            session['loggedin'] = True
+            session['UserID'] = account[0]
+            session['Email'] = account[1]
+
+            # Redirect the user to the "CarList" page after successful login
+            return redirect(url_for('select_all_from_table'))
+
+        else:
+            # Account doesn't exist or username/password is incorrect
+            msg = 'Incorrect username/password!'
+
+    is_user_logged_in = 'loggedin' in session and session['loggedin']
+
+    # Show the login form with a message (if any)
+    return render_template('login.html', msg=msg, is_user_logged_in=is_user_logged_in)
+
     
 @app.route('/logout')
 def logout():
@@ -492,4 +495,4 @@ def delete_car_inventory(selected_rows):
     mysql.get_db().commit()
     
 if __name__ == "__main__":
-    app.run(host="localhost", port=5000, debug=True)
+    app.run(host="localhost", port=5000)
