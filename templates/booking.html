@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Car Listing Page</title>
+    <title>Book Car Page</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     
@@ -9,6 +9,7 @@
 
     <link rel= "stylesheet" type= "text/css" href= "https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800&display=swap">
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/open-iconic-bootstrap.min.css') }}">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/bootstrap.min.css') }}">
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/animate.css') }}">
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/owl.carousel.min.css') }}">
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/owl.theme.default.min.css') }}">
@@ -20,8 +21,10 @@
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/flaticon.css') }}">
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/icomoon.css') }}">
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
-
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
   </head>
   <body>
     <h1>Summary of Car Details</h1>
@@ -31,38 +34,43 @@
     <p>Year: {{ year }}</p>
     <p>Body Type: {{ body_type }}</p>
 
-    <form id="dateForm" action="/checkout" method="POST" onsubmit="handleForm(event)">
-        <div>
-            <input type="hidden" name="license_plate" id="license_plate" value="{{ license_plate }}">
-        <input type="hidden" id="paymentType" name="paymentType" value="">
-        <label for="booking_date">Choose Date(s):</label>
-        <input type="text" id="booking_date" name="booking_date" placeholder="Please select date(s) for booking">
+    <section class="ftco-section ftco-car-details">
+        <div class="container">
+            <div class="row justify-content-center">
+                <form id="dateForm" action="/checkout" method="POST" onsubmit="handleForm(event)">
+                    <div>
+                        <input type="hidden" name="license_plate" id="license_plate" value="{{ license_plate }}">
+                    <input type="hidden" id="paymentType" name="paymentType" value="">
+                    <label for="booking_date">Choose Date(s):</label>
+                    <input type="text" id="booking_date" name="booking_date" placeholder="Please select date(s) for booking">
+                    </div>
+                    <br>
+                    <h5 class="card-title">Payment Mode</h5>
+                    <hr/>
+                    <div class="form-check ms-3 mt-3">
+                        <input class="form-check-input" type="radio" name="paymentRadio" id="creditCard" value="ccForm">
+                        <label class="form-check-label" for="creditCard">
+                        Credit Card
+                        </label>
+                    </div>
+                    <div class="form-check ms-3 mt-3">
+                        <input class="form-check-input" type="radio" name="paymentRadio" id="cashOnDelivery" value="codForm">
+                        <label class="form-check-label" for="cashOnDelivery">
+                        Cash on Delivery
+                        </label>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary rounded-pill px-3 mb-2 mb-lg-0" type="submit">
+                            <span class="d-flex align-items-center">
+                            <i class="bi bi-calendar2-check me-2" required></i>
+                                <span class="small">Place Booking</span>
+                            </span>
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
-        <br>
-        <h5 class="card-title">Payment Mode</h5>
-        <hr/>
-        <div class="form-check ms-3 mt-3">
-            <input class="form-check-input" type="radio" name="paymentRadio" id="creditCard" value="ccForm">
-            <label class="form-check-label" for="creditCard">
-            Credit Card
-            </label>
-        </div>
-        <div class="form-check ms-3 mt-3">
-            <input class="form-check-input" type="radio" name="paymentRadio" id="cashOnDelivery" value="codForm">
-            <label class="form-check-label" for="cashOnDelivery">
-            Cash on Delivery
-            </label>
-        </div>
-        <div>
-            <button class="btn btn-primary rounded-pill px-3 mb-2 mb-lg-0" type="submit">
-                <span class="d-flex align-items-center">
-                <i class="bi bi-calendar2-check me-2" required></i>
-                    <span class="small">Place Booking</span>
-                </span>
-            </button>
-        </div>
-    </form>
-
+    </section>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
         flatpickr("#booking_date", {
@@ -113,7 +121,5 @@
             }
         }
     </script>
-    
-
 </body>
 </html>

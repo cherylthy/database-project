@@ -57,13 +57,28 @@
 
 		<section class="ftco-section ftco-car-details">
       <div class="container">
-      	<div class="row justify-content-center">
+        <div class="row justify-content-center">
       		<div class="col-md-12">
-      			<div class="car-details">
-      				<p class="img rounded" style="background-image: url('{{ url_for('static', filename='assets/bg_1.jpg') }}');"></p>
+            <div class="car-details">
       				<div class="text text-center">
-      					<span class="subheading">{{ car_make }}</span>
+                <p class="img rounded" style="background-image: url('{{ url_for('static', filename='assets/bg_1.jpg') }}');"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      	<div class="row justify-content-center">
+      		<div class="col-md-9">
+      			<div class="car-details">
+      				<div class="text text-center">
+      					<span class="subheading" style="font-size: 20px;">{{ car_make }}</span>
       					<h2>{{ car_model }}</h2>
+      				</div>
+      			</div>
+      		</div>
+          <div class="col-md-3">
+      			<div class="car-price">
+      				<div>
+      					<p class="price ml-auto mt-3" style="color: #1089ff; font-weight: 600; font-size: 30px;">S${{price}}<span style="font-weight: 400; color: rgba(0, 0, 0, 0.3);">/day</span></p>
       				</div>
       			</div>
       		</div>
@@ -117,15 +132,23 @@
       	</div>
       	<div class="row">
       		<div class="col-md-6">
-
+            <h4>Details</h4>
+            <p>Colour: {{color}}<p>
+            <br>
+            <h5>Interior Features</h5>
+            <p>{{interior_features}}</p>
+            <br>
+            <h5>Exterior Features</h5>
+            <p>{{exterior_features}}</p>
+            <br>
+            <h5>Safety Features</h5>
+            <p>{{safety_features}}</p>
+            <br>
+            <h5>Entertainment Features</h5>
+            <p>{{entertainment_features}}</p>
+            <br>
 		      </div>
           <div class="col-md-6 align-items-center justify-content-center">
-              <div class="row justify-content-center">
-                <ul style="list-style-type: none; padding: 30px">
-                  <li style="background-color: #1089ff; color: white; font-size: 50px; padding: 10px 50px">S${{ price }}</li>
-                  <li style="background-color: white; color: #1089ff; border: 1px solid #1089ff; font-size: 25px; padding: 5px; text-align: center;">per day</li>
-                </ul>
-              </div>
               <div class="row justify-content-center dropdown">
                 <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   View other colours available:
@@ -138,6 +161,36 @@
               </div>
           </div>
 				</div>
+        <div id="pills-review">
+        <div class="row">
+          <div class="col-md-7">
+            <br>
+            <h4>Reviews</h4>
+            {% for review in reviews %}
+            <br>
+            <div class="review">
+              <div class="desc">
+                <h5 style="display: inline-block; width: 100%;">
+                  <span>{{ review[1] }}</span>
+                  <span style="float: right; font-size: 15px; color: rgba(0, 0, 0, 0.3); margin-top: 5px;">{{ review[4] }}</span>
+                </h5>
+                <p class="star" style="color: #1089ff;">
+                  {% for _ in range(review[7]) %}
+                    <i class="ion-ios-star"></i>
+                  {% endfor %}
+                  {% for _ in range(5 - review[7]) %}
+                    <i class="ion-ios-star-outline"></i>
+                  {% endfor %}
+                </p>
+                <p>{{ review[12] }}</p>
+                <br>
+                <hr>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       </div>
     </section>
 </body>

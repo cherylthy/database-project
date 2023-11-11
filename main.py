@@ -333,11 +333,16 @@ def display_car_details(car_id):
         colors = cursor.fetchall()
         cursor.close()
         
+        cursor = mysql.get_db().cursor()
+        cursor.execute("SELECT * FROM CarInventory LIMIT 5")
+        reviews = cursor.fetchall()
+        cursor.close()
+        
         return render_template('listing.html', license_plate=license_plate, car_make=car_make, car_model=car_model, 
                                body_type=body_type, color=color, transmission_type=transmission_type, price=price, 
                                safety_features=safety_features, entertainment_features=entertainment_features, 
                                interior_features=interior_features, exterior_features=exterior_features, 
-                               car_id=car_id, colors=colors)
+                               car_id=car_id, colors=colors, reviews=reviews)
 
     except Exception as e:
         return jsonify({'error': str(e)})
