@@ -310,13 +310,34 @@ def display_car_details(car_id):
         data = cursor.fetchone()
         cursor.close()
         if data:
-            license_plate = data[0]
-            car_make = data[1]
-            car_model = data[2]
-            year = data[3]
-            body_type = data[4]
+            column_names = [desc[0] for desc in cursor.description]
+            row_dict = dict(zip(column_names, data))
+
+            # Now you can access the values using column names
+            license_plate = row_dict['license_plate']
+            car_make = row_dict['car_make']
+            car_model = row_dict['car_model']
+            body_type = row_dict['body_type']
+            # year = row_dict['year']
+            color = row_dict['color']
+            transmission_type = row_dict['transmission_type']
+            # seats = row_dict['seats']
+            price = row_dict['daily_rate']
+            safety_features = row_dict['safety_features']
+            entertainment_features = row_dict['entertainment_features']
+            interior_features = row_dict['interior_features']
+            exterior_features = row_dict['exterior_features']
             
-            return render_template('listing.html', license_plate=license_plate, car_make=car_make, car_model=car_model, year=year, body_type=body_type, car_id=car_id)
+        cursor = mysql.get_db().cursor()
+        cursor.execute("SELECT color, license_plate FROM CarInventory WHERE car_model = %s AND color != %s", (car_model, color,))
+        colors = cursor.fetchall()
+        cursor.close()
+        
+        return render_template('listing.html', license_plate=license_plate, car_make=car_make, car_model=car_model, 
+                               body_type=body_type, color=color, transmission_type=transmission_type, price=price, 
+                               safety_features=safety_features, entertainment_features=entertainment_features, 
+                               interior_features=interior_features, exterior_features=exterior_features, 
+                               car_id=car_id, colors=colors)
 
     except Exception as e:
         return jsonify({'error': str(e)})
