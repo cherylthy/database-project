@@ -310,11 +310,11 @@ def cancel_booking():
 
 datepicker(app)
     
-@app.route('/listing/<carId>')
-def display_car_details(carId):
+@app.route('/listing/<car_id>')
+def display_car_details(car_id):
     try:
         cursor = mysql.get_db().cursor()
-        cursor.execute("SELECT * FROM CarInventory WHERE license_plate = %s", (carId,))
+        cursor.execute("SELECT * FROM CarInventory WHERE license_plate = %s", (car_id,))
         data = cursor.fetchone()
         cursor.close()
         if data:
@@ -324,16 +324,16 @@ def display_car_details(carId):
             year = data[3]
             body_type = data[4]
             
-            return render_template('listing.html', license_plate=license_plate, car_make=car_make, car_model=car_model, year=year, body_type=body_type, carId=carId)
+            return render_template('listing.html', license_plate=license_plate, car_make=car_make, car_model=car_model, year=year, body_type=body_type, car_id=car_id)
 
     except Exception as e:
         return jsonify({'error': str(e)})
 
-@app.route('/booking/<carId>')
-def booking_page(carId):
+@app.route('/booking/<car_id>')
+def booking_page(car_id):
     try:
         cursor = mysql.get_db().cursor()
-        cursor.execute("SELECT * FROM CarInventory WHERE license_plate = %s", (carId,))
+        cursor.execute("SELECT * FROM CarInventory WHERE license_plate = %s", (car_id,))
         data = cursor.fetchone()
         cursor.close()
         if data:
@@ -343,7 +343,7 @@ def booking_page(carId):
             year = data[3]
             body_type = data[4]
             
-            return render_template('booking.html', license_plate=license_plate, car_make=car_make, car_model=car_model, year=year, body_type=body_type, carId=carId)
+            return render_template('booking.html', license_plate=license_plate, car_make=car_make, car_model=car_model, year=year, body_type=body_type, car_id=car_id)
 
     except Exception as e:
         return jsonify({'error': str(e)})
@@ -351,81 +351,72 @@ def booking_page(carId):
 @app.route('/checkout', methods=['POST'])
 def pass_to_checkout():
     try:
-        license_plate = request.form['licensePlate']
-        # start_date = request.form['startDate']
-        # end_date = request.form['endDate']
-        date_range = request.form['bookingDate']
+        license_plate = request.form['license_plate']
+        date_range = request.form['booking_date']
         date_range = date_range.split(" to ")
-        start_date = date_range[0]
-        end_date = date_range[1]
-        UserId = session['UserID']
+        if len(date_range) == 2:
+            start_date = date_range[0]
+            end_date = date_range[1]
+        else:
+            # If there's only one date, set both start_date and end_date to that date
+            start_date = date_range[0]
+            end_date = date_range[0]
+        user_id = session['UserID']
         
-        return render_template('checkout.html', license_plate=license_plate, start_date=start_date, end_date=end_date, UserId=UserId)
+        return render_template('checkout.html', license_plate=license_plate, start_date=start_date, end_date=end_date, user_id=user_id)
     except Exception as e:
         return jsonify({'error': str(e)})
     
-def post_rental(UserId, PlateId, StartDate, EndDate):
+def post_rental(user_id, plate_id, start_date, end_date):
     try:
-        # UserId = session['UserID']
-        # PlateId = request.form['plateId']
-        # StartDate = request.form['start_date']
-        # EndDate = request.form['end_date']
-        
         cursor = mysql.get_db().cursor()
-        cursor.execute('INSERT INTO Rentals VALUES (NULL, %s, %s, %s, %s)', (UserId, PlateId, StartDate, EndDate))
+        cursor.execute('INSERT INTO Rentals VALUES (NULL, %s, %s, %s, %s)', (user_id, plate_id, start_date, end_date))
         mysql.get_db().commit()
-        rentalId = cursor.lastrowid
+        rental_id = cursor.lastrowid
         cursor.close()
         
-        return rentalId
-        # return jsonify({'rentalId': rentalId})
+        return rental_id
     except Exception as e:
-        print(str(e))  # Print the error for debugging
+        print(str(e))
         return None
     
 @app.route('/handle_booking', methods=['POST'])
 def handle_booking():
     try:
-        UserId = session['UserID']
-        PlateId = request.form['licensePlate']
-        # StartDate = request.form['startDate']
-        # EndDate = request.form['endDate']
-        dateRange = request.form['bookingDate']
-        dateRange = dateRange.split(" to ")
-        StartDate = dateRange[0]
-        EndDate = dateRange[1]
-        # Check the payment type
-        # selected_payment_type = request.form['paymentType']
-
-        # if selected_payment_type == 'codForm':
-        #     # Show a confirmation popup for Cash on Delivery
-        #     # return render_template('confirmation_popup.html', UserId=UserId, PlateId=PlateId, StartDate=StartDate, EndDate=EndDate)
-        #     return jsonify({'message': 'Cash on delivery form submitted.'})
-
-        # elif selected_payment_type == 'ccForm':
-            # Insert rental information and redirect to rental page
-        rentalId = post_rental(UserId, PlateId, StartDate, EndDate)
-        if rentalId is not None:
-            # return redirect(url_for('load_rental', rentalId=rentalId))
-            return jsonify({'rentalId': rentalId})
+        user_id = session['UserID']
+        plate_id = request.form['license_plate']
+        date_range = request.form['booking_date']
+        date_range = date_range.split(" to ")
+        if len(date_range) == 2:
+            start_date = date_range[0]
+            end_date = date_range[1]
+        else:
+            # If there's only one date, set both start_date and end_date to that date
+            start_date = date_range[0]
+            end_date = date_range[0]
+        print("to insert: ", user_id, plate_id, start_date, end_date)
+        # Insert rental information and redirect to rental page
+        rental_id = post_rental(user_id, plate_id, start_date, end_date)
+        if rental_id is not None:
+            return jsonify({'rental_id': rental_id})
         else:
             return jsonify({'error': 'Failed to insert rental information.'})
             
     except Exception as e:
         return jsonify({'error': str(e)})
     
-@app.route('/rental/<rentalId>')
-def load_rental(rentalId):
+@app.route('/rental/<rental_id>')
+def load_rental(rental_id):
     try:
         cursor = mysql.get_db().cursor()
-        cursor.execute("SELECT * FROM Rentals WHERE RentalID = %s", (rentalId,))
+        cursor.execute("SELECT * FROM Rentals WHERE RentalID = %s", (rental_id,))
         data = cursor.fetchone()
         cursor.close()
         if data:
             start_date = data[3]
             end_date = data[4]
             
-            return render_template('rental.html', start_date=start_date, end_date=end_date, rentalId=rentalId)
+            return render_template('rental.html', start_date=start_date, end_date=end_date, rental_id=rental_id)
 
     except Exception as e:
         return jsonify({'error': str(e)})
