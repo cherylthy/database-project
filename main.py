@@ -146,7 +146,7 @@ def admin_login():
 @app.route('/admin_dashboard', methods=['GET', 'POST'])
 def admin_dashboard():
     cursor = mysql.get_db().cursor()
-    cursor.execute("SELECT `License Plates`, `Car Make`, `Car Model`, `Body Type` FROM CarInventory")
+    cursor.execute("SELECT `license_plate`, `car_make`, `car_model`, `body_type`, `engine_size`, `transmission_type`,  `daily_rate` FROM CarInventory")
     data = cursor.fetchall()
     cursor.close()
     return render_template('admin_dashboard.html', data=data)
