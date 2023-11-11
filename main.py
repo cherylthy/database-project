@@ -8,6 +8,7 @@ import MySQLdb.cursors, re, hashlib
 from flask_debug import Debug
 from functools import wraps
 from flask import abort
+import logging
 
 app = Flask(__name__)
 
@@ -192,15 +193,6 @@ def admin_login():
             msg = 'Incorrect admin credentials!'
 
     return render_template('admin_login.html', msg=msg)
-
-@app.route('/admin_dashboard', methods=['GET', 'POST'])
-def admin_dashboard():
-    cursor = mysql.get_db().cursor()
-    cursor.execute("SELECT `license_plate`, `car_make`, `car_model`, `body_type`, `engine_size`, `transmission_type`,  `daily_rate` FROM CarInventory")
-    data = cursor.fetchall()
-    cursor.close()
-    return render_template('admin_dashboard.html', data=data)
-
 
 @app.route('/account')
 def accounts():
@@ -421,7 +413,7 @@ def load_rental(rental_id):
     except Exception as e:
         return jsonify({'error': str(e)})
 
-@app.route('/listings', methods=['GET', 'POST'])
+@app.route('/create_listings', methods=['GET', 'POST'])
 def add_listing():
     if request.method == 'POST':
         license_plate = request.form['license_plate']
@@ -441,7 +433,42 @@ def add_listing():
         # Redirect to the same page after successful form submission
         return redirect(url_for('add_listing'))
     
-    return render_template('listings.html', message='You have successfully listed a car!')
+    return render_template('create_listings.html', message='You have successfully listed a car!')
 
+@app.route('/admin_dashboard', methods=['GET', 'POST'])
+def admin_dashboard():
+    if request.method == 'GET':
+        cursor = mysql.get_db().cursor()
+        cursor.execute("SELECT `license_plate`, `car_make`, `car_model`, `body_type`, `engine_size`, `transmission_type`,  `daily_rate` FROM CarInventory")
+        data = cursor.fetchall()
+        cursor.close()
+        return render_template('admin_dashboard.html', data=data)
+    elif request.method == 'POST':
+        try:
+            # Get the selected rows from the request
+            selected_rows = request.get_json().get('rows')
+
+            # Delete selected rows from the database
+            delete_car_inventory(selected_rows)
+
+            return jsonify({'message': 'Rows deleted successfully'})
+        except Exception as e:
+            return jsonify({'error': str(e)})
+    
+    return render_template('admin_dashboard.html', data=data)
+def fetch_car_inventory():
+    # Fetch data from the CarInventory table
+    with mysql.get_db.cursor() as cursor:
+        cursor.execute("SELECT * FROM CarInventory")
+        data = cursor.fetchall()
+    return data
+
+def delete_car_inventory(selected_rows):
+    # Assuming 'license_plate' is the primary key column
+    with mysql.get_db().cursor() as cursor:
+        for license_plate in selected_rows:
+            cursor.execute("DELETE FROM CarInventory WHERE license_plate = %s", (license_plate,))
+    mysql.get_db().commit()
+    
 if __name__ == "__main__":
     app.run(host="localhost", port=5000, debug=True)
