@@ -431,5 +431,27 @@ def load_rental(rentalId):
     except Exception as e:
         return jsonify({'error': str(e)})
 
+@app.route('/listings', methods=['GET', 'POST'])
+def add_listing():
+    if request.method == 'POST':
+        license_plate = request.form['license_plate']
+        car_make = request.form['car_make']
+        car_model = request.form['car_model']
+        body_type = request.form['body_type']
+        engine_size = request.form['engine_size']
+        transmission_type = request.form['transmission_type']
+        price = request.form['price']
+
+        cursor = mysql.get_db().cursor()
+        
+        cursor.execute('INSERT INTO CarInventory VALUES (%s, %s, %s, %s, NULL, NULL, NULL, %s, NULL, %s, NULL, NULL, NULL, NULL, NULL, NULL, %s)', (license_plate, car_make, car_model, body_type, engine_size, transmission_type, price))
+        mysql.get_db().commit()
+        # Success message or redirect
+        cursor.close()
+        # Redirect to the same page after successful form submission
+        return redirect(url_for('add_listing'))
+    
+    return render_template('listings.html', message='You have successfully listed a car!')
+
 if __name__ == "__main__":
     app.run(host="localhost", port=5000)
