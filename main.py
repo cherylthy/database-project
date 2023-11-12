@@ -525,5 +525,46 @@ def delete_car_inventory(selected_rows):
             cursor.execute("DELETE FROM CarInventory WHERE license_plate = %s", (license_plate,))
     mysql.get_db().commit()
     
+
+@app.route('/all-reviews')
+def reviews():
+    try:
+        # Check if the user is logged in
+        if 'UserID' not in session:
+            return jsonify({'error': 'User not logged in'})
+
+        user_id = session['UserID']
+
+        result = crud.get("reviews")
+        # document_id = generate_document_id()
+        
+        # Add a document to a collection with a specific ID
+        # data = {"userID": 5432, "carID": 3333, "comments": "This car sucks", "ratings":4.5}
+        # crud.add('reviews', data=data, document_id=document_id)
+        
+        return render_template('all_reviews.html', reviews=result)
+
+        # cursor = mysql.get_db().cursor()
+        # cursor.execute("SELECT * FROM CarInventory")
+        # data = cursor.fetchall()
+        # cursor.close()
+        # return render_template('sql_test.html', data=data)
+
+        # cursor = mysql.get_db().cursor()
+        # # Fetch data only for the logged-in user
+        # cursor.execute("SELECT * FROM UserAccounts WHERE UserID = %s", (user_id,))
+        # data = cursor.fetchall()
+        # cursor.close()
+        
+        # Check if user exists
+        if not data:
+            return jsonify({'error': 'User not found'})
+
+        # return render_template('all_reviews.html', data=data)
+    
+    except Exception as e:
+        return jsonify({'error': str(e)})
+    
+
 if __name__ == "__main__":
     app.run(host="localhost", port=5000, debug=True)
