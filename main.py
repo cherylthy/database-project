@@ -337,10 +337,7 @@ def display_car_details(car_id):
         colors = cursor.fetchall()
         cursor.close()
         
-        cursor = mysql.get_db().cursor()
-        cursor.execute("SELECT * FROM CarInventory LIMIT 5")
-        reviews = cursor.fetchall()
-        cursor.close()
+        reviews = crud.get("reviews")
         
         return render_template('listing.html', license_plate=license_plate, car_make=car_make, car_model=car_model, 
                                body_type=body_type, color=color, transmission_type=transmission_type, price=price, 

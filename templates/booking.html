@@ -122,7 +122,6 @@
                 var countDays = eval( newEndDate - newStartDate );
                 var countDays = eval( countDays / 86400 + 1 );
                 
-                console.log( 'Amount of selected days: ' + countDays );
                 document.getElementById('countDays').textContent = countDays;
 
                 totalAmount = {{price}} * countDays;
