@@ -337,7 +337,8 @@ def display_car_details(car_id):
         colors = cursor.fetchall()
         cursor.close()
         
-        reviews = crud.get("reviews")
+        all_reviews = crud.get("reviews")
+        reviews = [review for review in all_reviews if review.get("carID") == car_id]
         
         return render_template('listing.html', license_plate=license_plate, car_make=car_make, car_model=car_model, 
                                body_type=body_type, color=color, transmission_type=transmission_type, price=price, 
