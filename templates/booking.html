@@ -25,6 +25,7 @@
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    {% include 'navbar.html' %}
   </head>
   <body>
     <section class="ftco-section ftco-car-details">
@@ -37,6 +38,11 @@
                     <p>Car Model: {{ car_model }}</p>
                     <p>Year: {{ year }}</p>
                     <p>Body Type: {{ body_type }}</p>
+                    <a class="btn btn-primary rounded-pill" href="/listing/{{ license_plate }}" style="margin-bottom: 25px">
+                        <span class="d-flex align-items-center">
+                            <span style="font-size: 16px;">View more details</span>
+                        </span>
+                    </a>                    
                 </div>
             </div>
             <div class="row justify-content-center mt-5">
@@ -80,7 +86,6 @@
                     <div>
                         <button class="btn btn-primary rounded-pill px-3 mb-2 mb-lg-0" type="submit" style="margin-top: 100px;">
                             <span class="d-flex align-items-center">
-                            <i class="bi bi-calendar2-check me-2" required></i>
                                 <span style="font-size: 16px;">Place Booking</span>
                             </span>
                         </button>
