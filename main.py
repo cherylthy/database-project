@@ -353,6 +353,16 @@ def display_car_details(car_id):
 @app.route('/booking/<car_id>')
 def booking_page(car_id):
     try:
+        user_id = session['UserID']
+        cursor = mysql.get_db().cursor()
+        cursor.execute("SELECT * FROM UserAccounts WHERE UserID = %s", (user_id,))
+        userdetails = cursor.fetchone()
+        cursor.close()
+        if userdetails:
+            name = userdetails[2]
+            phone_no = userdetails[4]
+            email = userdetails[5]
+        
         cursor = mysql.get_db().cursor()
         cursor.execute("SELECT * FROM CarInventory WHERE license_plate = %s", (car_id,))
         data = cursor.fetchone()
@@ -363,8 +373,10 @@ def booking_page(car_id):
             car_model = data[2]
             year = data[3]
             body_type = data[4]
+            price = data[16]
             
-            return render_template('booking.html', license_plate=license_plate, car_make=car_make, car_model=car_model, year=year, body_type=body_type, car_id=car_id)
+        return render_template('booking.html', license_plate=license_plate, car_make=car_make, car_model=car_model, 
+                               year=year, body_type=body_type, car_id=car_id, name=name, phone_no=phone_no, email=email, price=price)
 
     except Exception as e:
         return jsonify({'error': str(e)})

@@ -27,26 +27,40 @@
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
   </head>
   <body>
-    <h1>Summary of Car Details</h1>
-    <p>Car ID: {{ license_plate }}</p>
-    <p>Car Make: {{ car_make }}</p>
-    <p>Car Model: {{ car_model }}</p>
-    <p>Year: {{ year }}</p>
-    <p>Body Type: {{ body_type }}</p>
-
     <section class="ftco-section ftco-car-details">
         <div class="container">
             <div class="row justify-content-center">
-                <form id="dateForm" action="/checkout" method="POST" onsubmit="handleForm(event)">
-                    <div>
-                        <input type="hidden" name="license_plate" id="license_plate" value="{{ license_plate }}">
-                    <input type="hidden" id="paymentType" name="paymentType" value="">
-                    <label for="booking_date">Choose Date(s):</label>
-                    <input type="text" id="booking_date" name="booking_date" placeholder="Please select date(s) for booking">
-                    </div>
+                <div class="col-md-10" style="border: 1px solid black">
+                    <h4>Car Details</h4>
+                    <p>Car ID: {{ license_plate }}</p>
+                    <p>Car Make: {{ car_make }}</p>
+                    <p>Car Model: {{ car_model }}</p>
+                    <p>Year: {{ year }}</p>
+                    <p>Body Type: {{ body_type }}</p>
+                </div>
+            </div>
+            <div class="row justify-content-center mt-5">
+                <div class="col-md-5">
+                    <h4>Booking Details</h4>
+                    <form id="dateForm" action="/checkout" method="POST" onsubmit="handleForm(event)">
+                        <div>
+                            <input type="hidden" name="license_plate" id="license_plate" value="{{ license_plate }}">
+                            <input type="hidden" id="paymentType" name="paymentType" value="">
+                            <label for="booking_date">Choose Date(s): </label>
+                            <input type="text" class="booking_date" id="booking_date" name="booking_date" placeholder="Please select date(s) for booking" style="width: -webkit-fill-available;">
+                            <p style="font-size:12px;">Please press the date twice if you only want to book for 1 day</p>
+                        </div>
+                </div>
+                <div class="col-md-5">
+                    <label style="margin-top:65px;" id="selectedDaysCount">Number of days selected: <span style="color:black;" id="countDays">0</span></label>
+                    <br>
+                    <label id="totalPrice">Total Amount: S$<span style="color:black;" id="amount">0</span></label>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-md-5">
                     <br>
                     <h5 class="card-title">Payment Mode</h5>
-                    <hr/>
                     <div class="form-check ms-3 mt-3">
                         <input class="form-check-input" type="radio" name="paymentRadio" id="creditCard" value="ccForm">
                         <label class="form-check-label" for="creditCard">
@@ -60,24 +74,56 @@
                         </label>
                     </div>
                     <div>
-                        <button class="btn btn-primary rounded-pill px-3 mb-2 mb-lg-0" type="submit">
+                        <button class="btn btn-primary rounded-pill px-3 mb-2 mb-lg-0" type="submit" style="margin-top: 100px;">
                             <span class="d-flex align-items-center">
                             <i class="bi bi-calendar2-check me-2" required></i>
-                                <span class="small">Place Booking</span>
+                                <span style="font-size: 16px;">Place Booking</span>
                             </span>
                         </button>
                     </div>
-                </form>
+                </div>
+                <div class="col-md-5">
+                    <br>
+                    <h5>Customer Details</h5>
+                    <label for="custName">Customer Name: </label>
+                    <input style="background-color: #e9ecef; opacity: 1; border: 1px solid #ced4da;" id="custName" type="text" placeholder="{{name}}" readonly>
+                    <label for="custNum">Customer Phone Number: </label>
+                    <input style="background-color: #e9ecef; opacity: 1; border: 1px solid #ced4da;" id="custNum" type="text" placeholder="{{phone_no}}" readonly>
+                    <label for="custEmail">Customer Email: </label>
+                    <input style="background-color: #e9ecef; opacity: 1; border: 1px solid #ced4da;" id="custEmail" type="text" placeholder="{{email}}" readonly>
+                </div>
             </div>
+            </form>
         </div>
     </section>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
         flatpickr("#booking_date", {
-        enableTime: false,
-        mode: "range",
-        minDate: "today",
-        dateFormat: "Y-m-d"
+            enableTime: false,
+            mode: "range",
+            minDate: "today",
+            dateFormat: "Y-m-d",
+            onClose: function(date) { 
+            
+                var startDay = flatpickr.formatDate(date[0], "Y-m-d");
+                var endDay = flatpickr.formatDate(date[1], "Y-m-d");
+            
+                var newStartDate = new Date(startDay).getTime();
+                var newEndDate = new Date(endDay).getTime();
+                
+                var newStartDate = eval( newStartDate / 1000 + 3600 );
+                var newEndDate = eval( newEndDate / 1000 + 3600 );
+                
+                var countDays = eval( newEndDate - newStartDate );
+                var countDays = eval( countDays / 86400 + 1 );
+                
+                console.log( 'Amount of selected days: ' + countDays );
+                document.getElementById('countDays').textContent = countDays;
+
+                totalAmount = {{price}} * countDays;
+                console.log( 'Total Amount: ' + totalAmount );
+                document.getElementById('amount').textContent = totalAmount;
+            }
         });
 
         function handleForm(event) {
@@ -88,7 +134,7 @@
             const formData = new FormData(document.getElementById('dateForm'));
     
             if (selectedPaymentType === 'codForm') {
-                const proceed = window.confirm('Proceed with Cash on Delivery?');
+                const proceed = window.confirm('Proceed with Cash on Delivery? Pressing OK will confirm your booking.');
                 if (proceed) {
                     // If the user clicks "OK," call the function to insert into the table and redirect
                     fetch('/handle_booking', {
