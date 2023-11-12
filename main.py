@@ -524,6 +524,42 @@ def delete_car_inventory(selected_rows):
         for license_plate in selected_rows:
             cursor.execute("DELETE FROM CarInventory WHERE license_plate = %s", (license_plate,))
     mysql.get_db().commit()
+
+
+@app.route('/manage_users', methods=['GET', 'POST'])
+def manage_users():
+    if 'admin_loggedin' in session and session['admin_loggedin']:
+        if request.method == 'GET':
+            data = fetch_user_accounts()
+            return render_template('manage_users.html', data=data)
+
+        elif request.method == 'POST':
+            try:
+                # Get the selected users from the request
+                selected_users = request.get_json().get('users')
+
+                # Delete selected users from the database
+                delete_selected_users(selected_users)
+
+                return jsonify({'message': 'Users deleted successfully'})
+            except Exception as e:
+                return jsonify({'error': str(e)})
+    
+    else:
+        abort(403)  # HTTP status code for forbidden access
+
+def fetch_user_accounts():
+    with mysql.get_db().cursor() as cursor:
+            cursor.execute("SELECT 'UserId', `Name`, `Age`, `PhoneNo`, `Email` FROM UserAccounts")
+            data = cursor.fetchall()
+    return data
+
+def delete_selected_users(selected_users):
+    with mysql.get_db().cursor() as cursor:
+        for userid in selected_users:
+            cursor.execute("DELETE FROM UserAccounts WHERE UserID = %s", (userid,))
+    mysql.get_db().commit()
+
     
 
 @app.route('/all-reviews')
