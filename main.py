@@ -9,6 +9,7 @@ from flask_debug import Debug
 from functools import wraps
 from flask import abort
 import logging
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 
@@ -375,8 +376,23 @@ def booking_page(car_id):
             body_type = data[4]
             price = data[16]
             
+        cursor = mysql.get_db().cursor()
+        cursor.execute("SELECT * FROM Rentals WHERE PlateID = %s", (car_id,))
+        rentals = cursor.fetchall()
+        cursor.close()
+        
+        booked_dates = []
+        for rental in rentals:
+            start_date = rental[3]
+            end_date = rental[4]
+            
+            current_date = start_date
+            while current_date <= end_date:
+                booked_dates.append(current_date.strftime('%Y-%m-%d'))
+                current_date += timedelta(days=1)
+        print(booked_dates)
         return render_template('booking.html', license_plate=license_plate, car_make=car_make, car_model=car_model, 
-                               year=year, body_type=body_type, car_id=car_id, name=name, phone_no=phone_no, email=email, price=price)
+                               year=year, body_type=body_type, car_id=car_id, name=name, phone_no=phone_no, email=email, price=price, booked_dates=booked_dates)
 
     except Exception as e:
         return jsonify({'error': str(e)})

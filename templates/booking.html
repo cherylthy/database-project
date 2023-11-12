@@ -103,6 +103,7 @@
             mode: "range",
             minDate: "today",
             dateFormat: "Y-m-d",
+            disable: {{ booked_dates | tojson }},
             onClose: function(date) { 
             
                 var startDay = flatpickr.formatDate(date[0], "Y-m-d");
