@@ -274,24 +274,6 @@ def bookings():
         return jsonify({'error': 'User not found'})
     return render_template('user_bookings_overview.html', data=data)
 
-@app.route('/booking-individual')
-def individual_booking():
-    if 'UserID' not in session:
-        return jsonify({'error': 'User not logged in'})
-    if 'RentalID' not in session:
-        return jsonify({'error': 'Rental ID not found in session'})
-    print(session['RentalID'])
-    rental_id = session['RentalID']
-    cursor = mysql.get_db().cursor()
-    # Fetch data only for the logged-in user
-    cursor.execute("SELECT * FROM Rentals WHERE RentalID = %s", (rental_id))
-    data = cursor.fetchall()
-    cursor.close()
-    # Check if user exists
-    if not data:
-        return jsonify({'error': 'User not found'})
-    return render_template('user_individual_booking.html', data=data)
-
 @app.route('/cancel-booking', methods=['POST'])
 def cancel_booking():
     if 'UserID' not in session:
@@ -457,14 +439,13 @@ def handle_booking():
 def load_rental(rental_id):
     try:
         cursor = mysql.get_db().cursor()
-        cursor.execute("SELECT * FROM Rentals WHERE RentalID = %s", (rental_id,))
+        cursor.execute("SELECT CarInventory.car_make, CarInventory.car_model, CarInventory.license_plate, Rentals.StartDate, Rentals.EndDate FROM CarInventory INNER JOIN Rentals ON CarInventory.license_plate = Rentals.PlateID WHERE RentalID = %s", (rental_id,))
         data = cursor.fetchone()
         cursor.close()
         if data:
-            start_date = data[3]
-            end_date = data[4]
+            car_make, car_model, license_plate, StartDate, EndDate = data
             
-            return render_template('rental.html', start_date=start_date, end_date=end_date, rental_id=rental_id)
+            return render_template('rental.html', start_date=StartDate, end_date=EndDate, rental_id=rental_id, car_type=car_make + car_model, license_plate=license_plate)
 
     except Exception as e:
         return jsonify({'error': str(e)})
