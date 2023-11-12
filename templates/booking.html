@@ -54,7 +54,11 @@
                 <div class="col-md-5">
                     <label style="margin-top:65px;" id="selectedDaysCount">Number of days selected: <span style="color:black;" id="countDays">0</span></label>
                     <br>
-                    <label id="totalPrice">Total Amount: S$<span style="color:black;" id="amount">0</span></label>
+                    <label id="totalPrice">Booking Amount: S$<span style="color:black;" id="amount">0</span></label>
+                    <br>
+                    <label>Fixed Deposit: S$<span style="color:black;">200</span></label>
+                    <hr/>
+                    <label id="finalPrice">Total Amount: S$<span style="color:black;" id="final">0</span></label>
                 </div>
             </div>
             <div class="row justify-content-center">
@@ -122,8 +126,9 @@
                 document.getElementById('countDays').textContent = countDays;
 
                 totalAmount = {{price}} * countDays;
-                console.log( 'Total Amount: ' + totalAmount );
                 document.getElementById('amount').textContent = totalAmount;
+
+                document.getElementById('final').textContent = totalAmount + 200;
             }
         });
 
