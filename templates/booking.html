@@ -31,18 +31,22 @@
     <section class="ftco-section ftco-car-details">
         <div class="container">
             <div class="row justify-content-center">
-                <div class="col-md-10" style="border: 1px solid black">
-                    <h4>Car Details</h4>
-                    <p>Car ID: {{ license_plate }}</p>
-                    <p>Car Make: {{ car_make }}</p>
-                    <p>Car Model: {{ car_model }}</p>
-                    <p>Year: {{ year }}</p>
-                    <p>Body Type: {{ body_type }}</p>
-                    <a class="btn btn-primary rounded-pill" href="/listing/{{ license_plate }}" style="margin-bottom: 25px">
-                        <span class="d-flex align-items-center">
-                            <span style="font-size: 16px;">View more details</span>
-                        </span>
-                    </a>                    
+                <div class="col-md-10">
+                    <div class="card shadow">
+                        <div class="card-body">
+                            <h4>Car Details</h4>
+                            <p>Car ID: {{ license_plate }}</p>
+                            <p>Car Make: {{ car_make }}</p>
+                            <p>Car Model: {{ car_model }}</p>
+                            <p>Year: {{ year }}</p>
+                            <p>Body Type: {{ body_type }}</p>
+                            <a class="btn btn-primary rounded-pill" href="/listing/{{ license_plate }}" style="margin-bottom: 25px">
+                                <span class="d-flex align-items-center">
+                                    <span style="font-size: 16px;">View more details</span>
+                                </span>
+                            </a>
+                        </div>
+                    </div>                 
                 </div>
             </div>
             <div class="row justify-content-center mt-5">
@@ -52,8 +56,9 @@
                         <div>
                             <input type="hidden" name="license_plate" id="license_plate" value="{{ license_plate }}">
                             <input type="hidden" id="paymentType" name="paymentType" value="">
+                            <input type="hidden" id="final_amount" name="final_amount" value="">
                             <label for="booking_date">Choose Date(s): </label>
-                            <input type="text" class="booking_date" id="booking_date" name="booking_date" placeholder="Please select date(s) for booking" style="width: -webkit-fill-available;">
+                            <input type="text" autocomplete="off" class="booking_date" id="booking_date" name="booking_date" placeholder="Please select date(s) for booking" style="width: -webkit-fill-available;" required>
                             <p style="font-size:12px;">Please press the date twice if you only want to book for 1 day</p>
                         </div>
                 </div>
@@ -112,6 +117,7 @@
             mode: "range",
             minDate: "today",
             dateFormat: "Y-m-d",
+            allowInput: true,
             disable: {{ booked_dates | tojson }},
             onClose: function(date) { 
             
@@ -132,7 +138,9 @@
                 totalAmount = {{price}} * countDays;
                 document.getElementById('amount').textContent = totalAmount;
 
-                document.getElementById('final').textContent = totalAmount + 200;
+                finalAmount = totalAmount + 200;
+                document.getElementById('final').textContent = finalAmount;
+                document.getElementById('final_amount').value = finalAmount;
             }
         });
 

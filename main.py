@@ -387,7 +387,7 @@ def booking_page(car_id):
             while current_date <= end_date:
                 booked_dates.append(current_date.strftime('%Y-%m-%d'))
                 current_date += timedelta(days=1)
-        print(booked_dates)
+
         return render_template('booking.html', license_plate=license_plate, car_make=car_make, car_model=car_model, 
                                year=year, body_type=body_type, car_id=car_id, name=name, phone_no=phone_no, email=email, price=price, booked_dates=booked_dates)
 
@@ -399,6 +399,7 @@ def pass_to_checkout():
     try:
         license_plate = request.form['license_plate']
         date_range = request.form['booking_date']
+        total_amount = request.form['final_amount']
         date_range = date_range.split(" to ")
         if len(date_range) == 2:
             start_date = date_range[0]
@@ -409,7 +410,7 @@ def pass_to_checkout():
             end_date = date_range[0]
         user_id = session['UserID']
         
-        return render_template('checkout.html', license_plate=license_plate, start_date=start_date, end_date=end_date, user_id=user_id)
+        return render_template('checkout.html', license_plate=license_plate, start_date=start_date, end_date=end_date, user_id=user_id, total_amount=total_amount)
     except Exception as e:
         return jsonify({'error': str(e)})
     
@@ -440,7 +441,7 @@ def handle_booking():
             # If there's only one date, set both start_date and end_date to that date
             start_date = date_range[0]
             end_date = date_range[0]
-        print("to insert: ", user_id, plate_id, start_date, end_date)
+
         # Insert rental information and redirect to rental page
         rental_id = post_rental(user_id, plate_id, start_date, end_date)
         if rental_id is not None:
