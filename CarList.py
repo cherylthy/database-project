@@ -43,7 +43,12 @@ def select_all_from_table():
         car_makes = [make[0] for make in cursor.fetchall()]
         
         # Get filtering and sorting parameters from the request
-        make_filter = request.args.get('make', default=None, type=str)
+        make_filter = [request.args.get('make', default=None, type=str)]
+        if make_filter is None:
+            make_filter = []  # or set it to some default value if needed
+        else:
+            make_filter = [make_filter]
+        
         sort_by = request.args.get('sort_by', default='car_make', type=str)
         sort_order = request.args.get('sort_order', default='asc', type=str)
         page = request.args.get('page', default=1, type=int)
@@ -57,12 +62,19 @@ def select_all_from_table():
 
         # Check if there's a make_filter parameter
         if make_filter:
-            query += f" WHERE car_make = '{make_filter}'"
+            placeholders = ', '.join(['%s' for _ in make_filter[0]])
+            query += f" WHERE car_make IN ({placeholders})"
+            query_params = tuple(make_filter[0])  # Convert to tuple
+            print(query_params)
 
         query += f" ORDER BY {sort_by} {sort_order} LIMIT {offset}, {items_per_page}"
 
         cursor = mysql.get_db().cursor()
-        cursor.execute(query)
+        if make_filter:
+            cursor.execute(query, query_params)  # Pass the query parameters as a tuple
+        else:
+            cursor.execute(query)
+        
         data = cursor.fetchall()
         cursor.close()
 
