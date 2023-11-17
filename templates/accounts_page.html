@@ -7,20 +7,11 @@
     <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/account-page.css') }}">
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% include 'navbar.html' %}
+
 
 </head>
 <body>
-    <nav id="mySidenav" class="sidenav">
-        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-        <a href="#">Home</a>
-        <a href="#">About</a>
-        <a href="#">Services</a>
-        <a href="#">Locations</a>
-        <a href="#">Contact</a>
-      </nav>
-      
-      <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776;</span>
-
     <div class="account-information">
         {% for users in data %}
         <p> Profile Picture: <img class="profile-image" src="static/assets/{{users[6]}}" alt="Profile Picture" width="100" height="100"></p>

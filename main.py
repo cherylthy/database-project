@@ -211,13 +211,16 @@ def accounts():
         # Fetch data only for the logged-in user
         cursor.execute("SELECT * FROM UserAccounts WHERE UserID = %s", (user_id,))
         data = cursor.fetchall()
+        cursor.execute("SELECT DISTINCT * FROM CarInventory INNER JOIN Rentals ON CarInventory.license_plate = Rentals.PlateID WHERE Rentals.UserID =  %s LIMIT 5", (user_id))
+        booking_data = cursor.fetchall()
         cursor.close()
-        
-        # Check if user exists
-        if not data:
+        if booking_data:
+            session['RentalID'] = booking_data[0][0]  # Store the RentalID from the first row of the data
+            # Check if user exists
+        if not booking_data:
             return jsonify({'error': 'User not found'})
 
-        return render_template('accounts_page.html', data=data)
+        return render_template('acc_pg.html', data=data, booking_data=booking_data)
     
     except Exception as e:
         return jsonify({'error': str(e)})
@@ -229,12 +232,12 @@ def update_account():
             user_id = session['UserID']
             new_name = request.form.get('name')
             new_email = request.form.get('email')
-            new_password = request.form.get('password')
+            new_age = request.form.get('age')
             
             # Update the user information in the database using SQL UPDATE statement
             cursor = mysql.get_db().cursor()
-            cursor.execute("UPDATE UserAccounts SET Name=%s, Email=%s, Password=%s WHERE UserID=%s",
-                            (new_name, new_email, new_password, user_id))
+            cursor.execute("UPDATE UserAccounts SET Name=%s, Email=%s, Age=%s WHERE UserID=%s",
+                            (new_name, new_email, new_age, user_id))
             mysql.get_db().commit()
             cursor.close()
             

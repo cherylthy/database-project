@@ -40,6 +40,7 @@
   -webkit-box-sizing: border-box;
   box-sizing: border-box; }
 
+
 html {
   font-family: sans-serif;
   line-height: 1.15;
@@ -9069,7 +9070,7 @@ h1, h2, h3, h4, h5,
     -ms-transform: skewY(-4deg);
     -o-transform: skewY(-4deg);
     transform: skewY(-4deg);
-    background-color: #f8f9fa; }
+    background-color: #ffffff; }
 
 .aside-stretch {
   background: #43a2ff; }
@@ -9967,4 +9968,9 @@ textarea.form-control {
 
 .col-md-4 {
   margin-bottom: 20px; /* Add padding (margin) to the bottom of each column */
+}
+
+.fixed-width-section {
+  max-width: 1000px; /* Set the desired max-width for your section */
+  
 }
