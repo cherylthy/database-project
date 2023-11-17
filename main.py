@@ -218,7 +218,8 @@ def accounts():
             session['RentalID'] = booking_data[0][0]  # Store the RentalID from the first row of the data
             # Check if user exists
         if not booking_data:
-            return jsonify({'error': 'User not found'})
+            # return jsonify({'error': 'User not found'})
+            pass
 
         return render_template('acc_pg.html', data=data, booking_data=booking_data)
     

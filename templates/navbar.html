@@ -14,10 +14,10 @@
                 <li class="nav-item active"><a href="/" class="nav-link">Cars</a></li>
                 <li class="nav-item"><a href="contact.html" class="nav-link">Contact</a></li>
                 {% if session['loggedin'] != True %}
-                <li class="nav-item"><a href="login" class="nav-link">Login/Register</a></li>
+                <li class="nav-item"><a href="/login" class="nav-link">Login/Register</a></li>
                 {% endif %}
                 {% if session['loggedin'] %}
-                <li class="nav-item"><a href="account" class="nav-link">My Account</a></li>
+                <li class="nav-item"><a href="/account" class="nav-link">My Account</a></li>
                 {% endif %}
             </ul>
         </div>
