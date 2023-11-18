@@ -221,7 +221,7 @@ def accounts():
             # return jsonify({'error': 'User not found'})
             pass
 
-        return render_template('acc_pg.html', data=data, booking_data=booking_data)
+        return render_template('account_page.html', data=data, booking_data=booking_data)
     
     except Exception as e:
         return jsonify({'error': str(e)})
@@ -259,24 +259,6 @@ def delete_account():
     cursor.close()
 
     return redirect('/login')
-
-@app.route('/bookings-overview')
-def bookings():
-    # Check if the user is logged in
-    if 'UserID' not in session:
-        return jsonify({'error': 'User not logged in'})
-    user_id = session['UserID']
-    cursor = mysql.get_db().cursor()
-    # Fetch data only for the logged-in user
-    cursor.execute("SELECT DISTINCT * FROM CarInventory INNER JOIN Rentals ON CarInventory.license_plate = Rentals.PlateID WHERE Rentals.UserID =  %s LIMIT 5", (user_id))
-    data = cursor.fetchall()
-    cursor.close()
-    if data:
-        session['RentalID'] = data[0][0]  # Store the RentalID from the first row of the data
-    # Check if user exists
-    if not data:
-        return jsonify({'error': 'User not found'})
-    return render_template('user_bookings_overview.html', data=data)
 
 @app.route('/cancel-booking', methods=['POST'])
 def cancel_booking():
