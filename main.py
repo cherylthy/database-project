@@ -458,6 +458,24 @@ def add_listing():
     
     return render_template('create_listings.html', message='You have successfully listed a car!')
 
+def update_car_inventory(license_plate, car_make, car_model, body_type, engine_size, transmission_type, daily_rate):
+    try:
+        cursor = mysql.get_db().cursor()
+
+        # Use placeholders in the SQL query to avoid SQL injection
+        query = "UPDATE CarInventory SET car_make=%s, car_model=%s, body_type=%s, engine_size=%s, transmission_type=%s, daily_rate=%s WHERE license_plate=%s"
+        
+        # Execute the update query
+        cursor.execute(query, (car_make, car_model, body_type, engine_size, transmission_type, daily_rate, license_plate))
+        
+        # Commit the changes to the database
+        mysql.get_db().commit()
+        cursor.close()
+    except Exception as e:
+        # Rollback the changes in case of an error
+        mysql.get_db().rollback()
+        raise e
+
 @app.route('/admin_dashboard', methods=['GET', 'POST'])
 def admin_dashboard():
     if request.method == 'GET':
@@ -468,17 +486,37 @@ def admin_dashboard():
         return render_template('admin_dashboard.html', data=data)
     elif request.method == 'POST':
         try:
-            # Get the selected rows from the request
-            selected_rows = request.get_json().get('rows')
+            # Check if the request is for deleting rows
+            if request.json and 'rows' in request.json:
+                # Get the selected rows from the request
+                selected_rows = request.json.get('rows')
 
-            # Delete selected rows from the database
-            delete_car_inventory(selected_rows)
+                # Delete selected rows from the database
+                delete_car_inventory(selected_rows)
 
-            return jsonify({'message': 'Rows deleted successfully'})
+                return jsonify({'message': 'Rows deleted successfully'})
+            
+            # Check if the request is for updating a single row
+            elif request.json and 'license_plate' in request.json:
+                # Get the values for updating the row
+                license_plate = request.json.get('license_plate')
+                car_make = request.json.get('car_make')
+                car_model = request.json.get('car_model')
+                body_type = request.json.get('body_type')
+                engine_size = request.json.get('engine_size')
+                transmission_type = request.json.get('transmission_type')
+                daily_rate = request.json.get('daily_rate')
+
+                # Update the row in the database
+                update_car_inventory(license_plate, car_make, car_model, body_type, engine_size, transmission_type, daily_rate)
+
+                return jsonify({'message': 'Row updated successfully'})
         except Exception as e:
             return jsonify({'error': str(e)})
     
     return render_template('admin_dashboard.html', data=data)
+
+
 def fetch_car_inventory():
     # Fetch data from the CarInventory table
     with mysql.get_db.cursor() as cursor:

@@ -1,85 +1,95 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>Admin Dashboard</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/admin_dashboard.css') }}">
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <!-- Add any additional styles or scripts here -->
-</head>
-<body>
-
-<div class="navbar">
-    <a href="#" class="active">Dashboard</a>
-    <a href="#">Users</a>
-    <a href="{{ url_for('add_listing')}}">Create Listing</a>
-    <a href="{{ url_for('logout') }}">Logout</a>
-</div>
-
-<div class="content">
-    <h1>Welcome to the Admin Dashboard!</h1>
-    <!-- Add content specific to the admin dashboard here -->
-</div>
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
+    <title>Car Inventory</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/admin_dashboard.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 </head>
 <body>
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Car Inventory</title>
-</head>
-<body>
-    <h1>Car Inventory</h1>
-    <div class="table-container">
-        <form id="delete-form">
-        <table>
-            <thead>
-                <tr>
-                    <th>Select</th>
-                    <th>License Plate</th>
-                    <th>Car Make</th>
-                    <th>Car Model</th>
-                    <th>Body Type</th>
-                    <th>Engine Type in Litres</th>
-                    <th>Transmission</th>
-                    <th>Daily Rates</th>
-                    <!-- Add more columns based on your CarInventory table structure -->
-                </tr>
-            </thead>
-            <tbody>
-                {% for row in data %}
-                    <tr>
-                        <td><input type="checkbox" name="select_row" value="{{ row[0] }}"></td>
-                        <td>{{ row[0] }}</td>
-                        <td>{{ row[1] }}</td>
-                        <td>{{ row[2] }}</td>
-                        <td>{{ row[3] }}</td>
-                        <td>{{ row[4] }}</td>
-                        <td>{{ row[5] }}</td>
-                        <td>{{ row[6] }}</td>
-                        <!-- Add more columns based on your CarInventory table structure -->
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <button id="delete-selected">Delete Selected</button>
-        </form>
+    <div class="navbar">
+        <a href="#" class="active">Dashboard</a>
+        <a href="#">Users</a>
+        <a href="{{ url_for('add_listing')}}">Create Listing</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
     </div>
 
-<script src="static/js/admin_dashboard.js"></script>
-</body>
+    <div class="content">
+        <h1>Welcome to the Admin Dashboard!</h1>
+        <h2>Car Inventory</h2>
+        <div class="table-container">
+            <form id="delete-form">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Select</th>
+                            <th>License Plate</th>
+                            <th>Car Make</th>
+                            <th>Car Model</th>
+                            <th>Body Type</th>
+                            <th>Engine Type in Litres</th>
+                            <th>Transmission</th>
+                            <th>Daily Rates</th>
+                            <!-- Add more columns based on your CarInventory table structure -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in data %}
+                            <tr>
+                                <td><input type="checkbox" name="select_row" value="{{ row[0] }}"></td>
+                                <td>{{ row[0] }}</td>
+                                <td>{{ row[1] }}</td>
+                                <td>{{ row[2] }}</td>
+                                <td>{{ row[3] }}</td>
+                                <td>{{ row[4] }}</td>
+                                <td>{{ row[5] }}</td>
+                                <td>{{ row[6] }}</td>
+                                <!-- Add more columns based on your CarInventory table structure -->                        
+                                <td><button type="button" class="edit-button" onclick="openModal('{{ row[0] }}', '{{ row[1] }}', '{{ row[2] }}', '{{ row[3] }}', '{{ row[4] }}', '{{ row[5] }}', '{{ row[6] }}')">Edit</button></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                    <!-- Your table content goes here -->
+                </table>
+                <button id="delete-selected">Delete Selected</button>
+            </form>
+        </div>
 
-    </html>
-    
-</body>
-</html>
+        <!-- Modal for Editing -->
+        <div id="editModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <h2>Edit Car Details</h2>
+                <form id="edit-form" onsubmit="saveChanges(event)">
+                    <label for="license-plate">License Plate:</label>
+                    <input type="text" id="license-plate" name="license-plate" readonly>
+                
+                    <label for="car-make">Car Make:</label>
+                    <input type="text" id="car-make" name="car-make">
+                
+                    <label for="car-model">Car Model:</label>
+                    <input type="text" id="car-model" name="car-model">
+
+                    <label for="body-type">Body Type:</label>
+                    <input type="text" id="body-type" name="body-type">
+
+                    <label for="engine-type">Engine Type:</label>
+                    <input type="text" id="engine-type" name="engine-type">
+
+                    <label for="transmission-type">Transmission Type:</label>
+                    <input type="text" id="transmission-type" name="transmission-type">
+
+                    <label for="daily-rate">Daily Rates:</label>
+                    <input type="text" id="daily-rates" name="daily-rates">
+                    <!-- Your form fields for editing go here -->
+                    <button type="submit">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="static/js/admin_dashboard.js"></script>
+    <script src="static/js/admin_dashboard_edit.js"></script>
 </body>
 </html>
