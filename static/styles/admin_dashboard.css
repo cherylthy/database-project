@@ -117,3 +117,32 @@ tr:hover {
     text-decoration: none;
     cursor: pointer;
 }
+
+/* Responsive Pagination Styles */
+.pagination-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pagination {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+}
+
+.pagination li {
+    margin: 0 5px;
+}
+
+/* Media Query for Small Screens */
+@media screen and (max-width: 600px) {
+    .table-container {
+        width: 100%;
+    }
+
+    th, td {
+        padding: 8px;
+    }
+}

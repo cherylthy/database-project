@@ -10,6 +10,7 @@ from functools import wraps
 from flask import abort
 import logging
 from datetime import datetime, timedelta
+from flask_paginate import Pagination
 
 app = Flask(__name__)
 
@@ -478,12 +479,21 @@ def update_car_inventory(license_plate, car_make, car_model, body_type, engine_s
 
 @app.route('/admin_dashboard', methods=['GET', 'POST'])
 def admin_dashboard():
+
+    page = request.args.get('page', 1, type=int)
+    per_page = 15  # the number of items per page
+
     if request.method == 'GET':
         cursor = mysql.get_db().cursor()
         cursor.execute("SELECT `license_plate`, `car_make`, `car_model`, `body_type`, `engine_size`, `transmission_type`,  `daily_rate` FROM CarInventory")
         data = cursor.fetchall()
         cursor.close()
-        return render_template('admin_dashboard.html', data=data)
+
+        pagination = Pagination(page=page, per_page=per_page, total=len(data), record_name='data')
+        paginated_data = data[(page-1)*per_page:page*per_page]
+
+
+        return render_template('admin_dashboard.html', data=paginated_data, pagination=pagination)
     elif request.method == 'POST':
         try:
             # Check if the request is for deleting rows
@@ -514,7 +524,7 @@ def admin_dashboard():
         except Exception as e:
             return jsonify({'error': str(e)})
     
-    return render_template('admin_dashboard.html', data=data)
+    return render_template('admin_dashboard.html',  data=data, pagination=pagination)
 
 
 def fetch_car_inventory():
@@ -522,7 +532,12 @@ def fetch_car_inventory():
     with mysql.get_db.cursor() as cursor:
         cursor.execute("SELECT * FROM CarInventory")
         data = cursor.fetchall()
-    return data
+
+    # Paginate the data
+    pagination = Pagination(page=page, per_page=per_page, total=len(data), record_name='data')
+    paginated_data = data[(page-1)*per_page:page*per_page]
+
+    return render_template('admin_dashboard.html', data=paginated_data, pagination=pagination)
 
 def delete_car_inventory(selected_rows):
     # Assuming 'license_plate' is the primary key column
@@ -532,7 +547,7 @@ def delete_car_inventory(selected_rows):
     mysql.get_db().commit()
 
 
-@app.route('/manage_users', methods=['GET', 'POST'])
+@app.route('/admin_dashboard/manage_users', methods=['GET', 'POST'])
 def manage_users():
     if 'admin_loggedin' in session and session['admin_loggedin']:
         if request.method == 'GET':
