@@ -3,7 +3,6 @@ from firebase import Firebase
 from flaskext.mysql import MySQL
 import uuid
 import MySQLdb.cursors
-from flask_datepicker import datepicker
 import MySQLdb.cursors, re, hashlib
 from flask_debug import Debug
 from functools import wraps
@@ -165,7 +164,7 @@ def register():
            # password = hash.hexdigest()
 
             # Account doesn't exist, and the form data is valid, so insert the new account into the UserAccounts table
-            cursor.execute('INSERT INTO UserAccounts VALUES (NULL, %s, %s, %s, %s, %s, NULL, NULL)', (password, name, age, phoneno, email))
+            cursor.callproc('AddUserAccount', (password, name, age, phoneno, email))
             mysql.get_db().commit()
             msg = 'You have successfully registered!'
 
@@ -210,9 +209,9 @@ def accounts():
 
         cursor = mysql.get_db().cursor()
         # Fetch data only for the logged-in user
-        cursor.execute("SELECT * FROM UserAccounts WHERE UserID = %s", (user_id,))
+        cursor.callproc('GetUserAccountData', (user_id,))
         data = cursor.fetchall()
-        cursor.execute("SELECT DISTINCT * FROM CarInventory INNER JOIN Rentals ON CarInventory.license_plate = Rentals.PlateID WHERE Rentals.UserID =  %s LIMIT 5", (user_id))
+        cursor.callproc('GetDistinctBookingForUser', (user_id,))
         booking_data = cursor.fetchall()
         cursor.close()
         if booking_data:
@@ -232,17 +231,20 @@ def update_account():
     try:
          if 'UserID' in session:
             user_id = session['UserID']
+            print(user_id)
             new_name = request.form.get('name')
             new_email = request.form.get('email')
             new_age = request.form.get('age')
             
-            # Update the user information in the database using SQL UPDATE statement
+            # Input validation (add more checks based on your requirements)
+            if not new_name or not new_email or not new_age:
+                return jsonify({'error': 'Incomplete data provided'})
+
             cursor = mysql.get_db().cursor()
-            cursor.execute("UPDATE UserAccounts SET Name=%s, Email=%s, Age=%s WHERE UserID=%s",
-                            (new_name, new_email, new_age, user_id))
+            cursor.callproc('UpdateUserAccount', (user_id, new_name, new_email, new_age))
             mysql.get_db().commit()
             cursor.close()
-            
+                
             return redirect('/account')  # Redirect to account page after successful update
             
     except Exception as e:
@@ -265,15 +267,23 @@ def delete_account():
 def cancel_booking():
     if 'UserID' not in session:
         return jsonify({'error': 'User not logged in'})
+    
     user_id = session['UserID']
-    booking_id = request.form.get('booking_id')
+    
+    # Check if 'booking_id' is present in the form data
+    if 'rental_id' not in request.form:
+        return jsonify({'error': 'Booking ID not found in form data'})
+
+    rental_id = request.form.get('rental_id')
+
     cursor = mysql.get_db().cursor()
-    cursor.execute("DELETE FROM Rentals WHERE UserID = %s AND RentalID = %s", (user_id, booking_id))
+    cursor.callproc('CancelBooking', (user_id, rental_id))
     mysql.get_db().commit()
     cursor.close()
-    return redirect('/bookings-overview')
 
-datepicker(app)
+    return redirect('/account')
+
+
     
 @app.route('/listing/<car_id>')
 def display_car_details(car_id):

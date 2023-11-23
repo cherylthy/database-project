@@ -48,7 +48,13 @@
                                         </div>
                                     </div>
                               </div>
-                              <p><a href="#" class="btn btn-primary py-3 px-4">Return Car Now</a></p>
+                              <div class="d-flex">
+                                <p><a href="#" class="btn btn-primary py-3 px-4" style="margin-right: 10px;">Return Car Now</a></p>
+                                <form id="cancelBookingForm" action="/cancel-booking" method="post">
+                                  <input type="hidden" name="rental_id" value="{{ rental_id }}">
+                                  <p><button type="button" class="btn btn-primary py-3 px-4" onclick="cancelBooking()">Cancel Booking</button></p>
+                                </form>
+                                 </div>
                                 </div>
                             </div>
                         </div>
@@ -139,6 +145,16 @@
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
     <script src="js/google-map.js"></script>
     <script src="js/main.js"></script>
-      
+    <script>
+      function cancelBooking() {
+          // You can add any additional confirmation logic here
+          var confirmCancel = confirm("Are you sure you want to cancel the booking?");
+          
+          if (confirmCancel) {
+              // Submit the form
+              document.getElementById("cancelBookingForm").submit();
+          }
+      }
+  </script>
     </body>
 </html>

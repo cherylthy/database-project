@@ -73,6 +73,7 @@
                                             <input type="hidden" name="UserID" value="{{ users[0] }}">
                                             <button type="submit">Delete Account</button>
                                         </form>
+                                        <button onclick="window.location.href='/logout'" style="margin-bottom: 10px; margin-left: 10px;" >Logout</button>
                                     </div>
                     
                                     <form id="editForm" style="display: none" action="/update" method="post">
@@ -109,18 +110,18 @@
                                                         <!-- <div class="user-img mb-2" style="background-image: url(static/assets/{{ booking.image_path }})">
                                                         </div> -->
                                                         <div class="text pt-4">
-                                                            <p class="mb-4">Booking ID: {{ booking[17] }}</p>
+                                                            <p class="mb-4">Booking ID: {{ booking[21] }}</p>
                                                             <div class="car-info">
-                                                              <p class="name">{{ booking[1] }}</p>
-                                                              <p class="name">{{ booking[2] }}</p>
+                                                              <p class="name"> {{ booking[1] }}</p>
+                                                              <p class="name" style = "margin-left:5px;">{{ booking[2] }}</p>
                                                           </div> 
                                                             <p class="name">{{ booking[0] }}</p>
                                                             <div class="date-info">
-                                                              <p class="name">{{ booking[20] }}</p>
-                                                              <p class="name">{{ booking[21] }}</p>
+                                                              <p class="name">{{ booking[24] }}</p>
+                                                              <p class="name">{{ booking[25] }}</p>
                                                           </div>            
                                                           <br>                      
-                                                          <a href="/rental/{{booking[17]}}" class="btn btn-primary py-3 px-4">View Details</a>
+                                                          <a href="/rental/{{booking[21]}}" class="btn btn-primary py-3 px-4">View Details</a>
                                                         </div>
                                                     </div>
                                                 </div>
