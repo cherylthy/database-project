@@ -57,6 +57,7 @@
                                     <input type="hidden" name="booking_date" id="booking_date" value="{{ start_date }} to {{ end_date }}">
                                     <input type="hidden" name="start_date" id="start_date" value="{{ start_date }}">
                                     <input type="hidden" name="end_date" id="end_date" value="{{ end_date }}">
+                                    <input type="hidden" id="final_amount" name="final_amount" value="{{ total_amount }}">
 
                                     <button id="paymentFormBtn" class="btn btn-primary rounded-pill float-end mt-2" form="ccForm">Make payment of S${{ total_amount }}</button>
                                 </form>
