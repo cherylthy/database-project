@@ -9,7 +9,7 @@
 </head>
 <body>
     <div class="navbar">
-        <a href="#" class="active">Dashboard</a>
+        <a href="{{ url_for('admin_dashboard')}}" class="active">Dashboard</a>
         <a href="{{ url_for('manage_users')}}">Users</a>
         <a href="{{ url_for('add_listing')}}">Create Listing</a>
         <a href="{{ url_for('logout') }}">Logout</a>

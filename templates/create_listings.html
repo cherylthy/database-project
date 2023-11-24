@@ -18,9 +18,15 @@
   <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/icomoon.css') }}">
   <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
   <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/listings.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/admin_dashboard.css') }}">
 </head>
 <body>
-
+  <div class="navbar">
+    <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('manage_users') }}">Users</a>
+    <a href="{{ url_for('add_listing')}}" class="active">Create Listings</a>
+    <a href="{{ url_for('logout') }}">Logout</a>
+</div>
   <form action="/create_listings" method="post">
     <h2>Car Listing Form</h2>
 
