@@ -186,12 +186,12 @@ def admin_login():
         email = request.form['Email']
         password = request.form['Password']
 
-        # Check if the credentials belong to an admin
+        # Call the stored procedure
         admin_cursor = mysql.get_db().cursor()
-        admin_cursor.execute('SELECT * FROM UserAccounts WHERE Email = %s AND Password = %s AND IsAdmin = 1', (email, password,))
-        admin_account = admin_cursor.fetchone()
+        admin_cursor.callproc('ValidateAdminCredentials', (email, password))
+        p_is_valid = admin_cursor.fetchone()
 
-        if admin_account:
+        if p_is_valid:
             session['admin_loggedin'] = True
             return redirect(url_for('admin_dashboard'))
         else:
