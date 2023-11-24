@@ -626,7 +626,33 @@ def delete_selected_users(selected_users):
         for userid in selected_users:
             cursor.execute("DELETE FROM UserAccounts WHERE UserID = %s", (userid,))
     mysql.get_db().commit()
+    
+    
+@app.route('/admin_metrics', methods=['GET'])
+def admin_metrics():
+    try:
+        cursor = mysql.get_db().cursor()
+        cursor.execute("SELECT CONCAT(YEAR(StartDate), '-', LPAD(MONTH(StartDate), 2, '0')) AS month, SUM(TotalAmount) AS monthly_sales FROM Rentals GROUP BY month")
+        monthly_sales = cursor.fetchall()
+        
+        cursor.execute("SELECT CONCAT(YEAR(StartDate), '-', LPAD(MONTH(StartDate), 2, '0')) AS month, COUNT(RentalId) AS monthly_count FROM Rentals GROUP BY month")
+        monthly_count = cursor.fetchall()
+        
+        cursor.execute("SELECT SUM(TotalAmount) as yearly_sales, YEAR(StartDate) as start_month from Rentals GROUP BY YEAR(StartDate)")
+        yearly_sales = cursor.fetchall()
+        
+        cursor.execute("SELECT COUNT(RentalId) as yearly_count, YEAR(StartDate) as start_month from Rentals GROUP BY YEAR(StartDate)")
+        yearly_count = cursor.fetchall()
+        
+        cursor.execute("SELECT COUNT(license_plate) as car_count FROM CarInventory")
+        car_count = cursor.fetchone()
+        car_count = car_count[0]
+        cursor.close()
+        
+        return render_template('admin_metrics.html', monthly_sales=monthly_sales, monthly_count=monthly_count, yearly_sales=yearly_sales, yearly_count=yearly_count, car_count=car_count)
 
+    except Exception as e:
+        return jsonify({'error': str(e)})
     
 
 @app.route('/all-reviews')
