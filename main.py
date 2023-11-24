@@ -298,7 +298,7 @@ def cancel_booking():
 def display_car_details(car_id):
     try:
         cursor = mysql.get_db().cursor()
-        cursor.execute("SELECT * FROM CarInventory WHERE license_plate = %s", (car_id,))
+        cursor.execute("SELECT * FROM CarInventory v INNER JOIN CarInformation f ON v.car_model = f.car_model WHERE license_plate = %s", (car_id,))
         data = cursor.fetchone()
         cursor.close()
         if data:
@@ -341,7 +341,7 @@ def booking_page(car_id):
     try:
         user_id = session['UserID']
         cursor = mysql.get_db().cursor()
-        cursor.execute("SELECT * FROM UserAccounts WHERE UserID = %s", (user_id,))
+        cursor.execute("SELECT * FROM UserAccounts WHERE user_id = %s", (user_id,))
         userdetails = cursor.fetchone()
         cursor.close()
         if userdetails:
@@ -350,19 +350,19 @@ def booking_page(car_id):
             email = userdetails[5]
         
         cursor = mysql.get_db().cursor()
-        cursor.execute("SELECT * FROM CarInventory WHERE license_plate = %s", (car_id,))
+        cursor.execute("SELECT * FROM CarInventory v INNER JOIN CarInformation f ON v.car_model = f.car_model WHERE license_plate = %s", (car_id,))
         data = cursor.fetchone()
         cursor.close()
         if data:
             license_plate = data[0]
             car_make = data[1]
             car_model = data[2]
-            year = data[3]
+            # year = data[3]
             body_type = data[4]
             price = data[16]
             
         cursor = mysql.get_db().cursor()
-        cursor.execute("SELECT * FROM Rentals WHERE PlateID = %s", (car_id,))
+        cursor.execute("SELECT * FROM Rentals WHERE plate_id = %s", (car_id,))
         rentals = cursor.fetchall()
         cursor.close()
         
@@ -377,7 +377,7 @@ def booking_page(car_id):
                 current_date += timedelta(days=1)
 
         return render_template('booking.html', license_plate=license_plate, car_make=car_make, car_model=car_model, 
-                               year=year, body_type=body_type, car_id=car_id, name=name, phone_no=phone_no, email=email, price=price, booked_dates=booked_dates)
+                               body_type=body_type, car_id=car_id, name=name, phone_no=phone_no, email=email, price=price, booked_dates=booked_dates)
 
     except Exception as e:
         return jsonify({'error': str(e)})
