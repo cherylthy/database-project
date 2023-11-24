@@ -43,7 +43,7 @@ def select_all_from_table():
     try:
         # Fetch distinct car makes for the dropdown
         cursor = mysql.get_db().cursor()
-        cursor.execute("SELECT DISTINCT car_make FROM CarInventory")
+        cursor.execute("SELECT DISTINCT car_make FROM CarInformation")
         car_makes = [make[0] for make in cursor.fetchall()]
         
         # Get filtering and sorting parameters from the request
@@ -57,11 +57,11 @@ def select_all_from_table():
         offset = (page - 1) * items_per_page
 
         # Build the SQL query based on filtering and sorting parameters
-        query = "SELECT license_plate, car_make, car_model, daily_rate, image_path_1 FROM CarInventory"
+        query = "SELECT v.license_plate, f.car_make, v.car_model, f.daily_rate, i.image_path FROM ((CarInventory v INNER JOIN CarInformation f ON v.car_model = f.car_model) INNER JOIN CarImage i ON v.car_model = i.car_model)"
 
         # Check if there's a make_filter parameter
         if make_filter:
-            query += f" WHERE car_make = '{make_filter}'"
+            query += f" WHERE f.car_make = '{make_filter}'"
 
         query += f" ORDER BY {sort_by} {sort_order} LIMIT {offset}, {items_per_page}"
 
@@ -75,7 +75,7 @@ def select_all_from_table():
 
         # Check if there's a make_filter parameter
         if make_filter:
-            total_query += f" WHERE car_make = '{make_filter}'"
+            total_query += f" WHERE f.car_make = '{make_filter}'"
 
         cursor = mysql.get_db().cursor()
         cursor.execute(total_query)
