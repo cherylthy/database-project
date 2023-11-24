@@ -57,6 +57,7 @@
                             <input type="hidden" name="license_plate" id="license_plate" value="{{ license_plate }}">
                             <input type="hidden" id="paymentType" name="paymentType" value="">
                             <input type="hidden" id="final_amount" name="final_amount" value="">
+                            <input type="hidden" id="rental_time" name="rental_time" value="">
                             <label for="booking_date">Choose Date(s): </label>
                             <input type="text" autocomplete="off" class="booking_date" id="booking_date" name="booking_date" placeholder="Please select date(s) for booking" style="width: -webkit-fill-available;" required>
                             <p style="font-size:12px;">Please press the date twice if you only want to book for 1 day</p>
@@ -148,9 +149,8 @@
             event.preventDefault();
     
             const selectedPaymentType = document.querySelector('input[name="paymentRadio"]:checked').value;
-            document.getElementById('paymentType').value = selectedPaymentType;
             const formData = new FormData(document.getElementById('dateForm'));
-    
+
             if (selectedPaymentType === 'codForm') {
                 const proceed = window.confirm('Proceed with Cash on Delivery? Pressing OK will confirm your booking.');
                 if (proceed) {

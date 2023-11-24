@@ -10,6 +10,7 @@ from flask import abort
 import logging
 from datetime import datetime, timedelta
 from flask_paginate import Pagination
+import datetime
 
 app = Flask(__name__)
 
@@ -394,10 +395,10 @@ def pass_to_checkout():
     except Exception as e:
         return jsonify({'error': str(e)})
     
-def post_rental(user_id, plate_id, start_date, end_date):
+def post_rental(user_id, plate_id, start_date, end_date, total_amount, timestamp):
     try:
         cursor = mysql.get_db().cursor()
-        cursor.execute('INSERT INTO Rentals VALUES (NULL, %s, %s, %s, %s)', (user_id, plate_id, start_date, end_date))
+        cursor.execute('INSERT INTO Rentals VALUES (NULL, %s, %s, %s, %s, %s, %s)', (user_id, plate_id, start_date, end_date, total_amount, timestamp))
         mysql.get_db().commit()
         rental_id = cursor.lastrowid
         cursor.close()
@@ -413,6 +414,13 @@ def handle_booking():
         user_id = session['UserID']
         plate_id = request.form['license_plate']
         date_range = request.form['booking_date']
+        total_amount = request.form['final_amount']
+
+        current_utc_time = datetime.datetime.utcnow()
+        singapore_timezone_offset = datetime.timedelta(hours=8)
+        singapore_time = current_utc_time + singapore_timezone_offset
+        formatted_singapore_time = singapore_time.strftime('%Y-%m-%d %H:%M:%S')
+
         date_range = date_range.split(" to ")
         if len(date_range) == 2:
             start_date = date_range[0]
@@ -423,7 +431,7 @@ def handle_booking():
             end_date = date_range[0]
 
         # Insert rental information and redirect to rental page
-        rental_id = post_rental(user_id, plate_id, start_date, end_date)
+        rental_id = post_rental(user_id, plate_id, start_date, end_date, total_amount, formatted_singapore_time)
         if rental_id is not None:
             return jsonify({'rental_id': rental_id})
         else:
