@@ -33,6 +33,11 @@ mysql.init_app(app)
 app.secret_key = 'secret'
 Debug(app)
 
+def generate_document_id():
+    # Generate a random unique identifier
+    unique_id = str(uuid.uuid4())
+    return f"reviews-{unique_id}"
+
 @app.route('/')
 def select_all_from_table():
     try:
@@ -222,7 +227,10 @@ def accounts():
             # return jsonify({'error': 'User not found'})
             pass
 
-        return render_template('account_page.html', data=data, booking_data=booking_data)
+        all_reviews = crud.get("reviews")
+        reviews = [review for review in all_reviews if review.get("userID") == user_id]
+
+        return render_template('account_page.html', data=data, booking_data=booking_data, reviews=reviews)
     
     except Exception as e:
         return jsonify({'error': str(e)})
@@ -317,8 +325,7 @@ def display_car_details(car_id):
         colors = cursor.fetchall()
         cursor.close()
         
-        all_reviews = crud.get("reviews")
-        reviews = [review for review in all_reviews if review.get("carID") == car_id]
+        reviews = [review for review in all_reviews if review.get("plateID") == car_id]
         
         return render_template('listing.html', license_plate=license_plate, car_make=car_make, car_model=car_model, 
                                body_type=body_type, color=color, transmission_type=transmission_type, price=price, 
@@ -440,18 +447,39 @@ def handle_booking():
     except Exception as e:
         return jsonify({'error': str(e)})
     
-@app.route('/rental/<rental_id>')
+@app.route('/rental/<rental_id>', methods=['GET', 'POST'])
 def load_rental(rental_id):
     try:
         cursor = mysql.get_db().cursor()
-        cursor.execute("SELECT CarInventory.car_make, CarInventory.car_model, CarInventory.license_plate, Rentals.StartDate, Rentals.EndDate FROM CarInventory INNER JOIN Rentals ON CarInventory.license_plate = Rentals.PlateID WHERE RentalID = %s", (rental_id,))
+        cursor.execute("SELECT CarInventory.car_make, CarInventory.car_model, CarInventory.license_plate, Rentals.StartDate, Rentals.EndDate, Rentals.TotalAmount, Rentals.Timestamp FROM CarInventory INNER JOIN Rentals ON CarInventory.license_plate = Rentals.PlateID WHERE RentalID = %s", (rental_id,))
         data = cursor.fetchone()
         cursor.close()
         if data:
-            car_make, car_model, license_plate, StartDate, EndDate = data
+            car_make, car_model, license_plate, StartDate, EndDate, total_amount, timestamp = data
             
-            return render_template('rental.html', start_date=StartDate, end_date=EndDate, rental_id=rental_id, car_type=car_make + car_model, license_plate=license_plate)
-
+            
+        # data = cursor.fetchone()
+        # cursor.close()
+        # if data:
+        #     user_id = data['userID']
+        #     user_name = data['Name']
+        #     plate_id = data['PlateID']
+        # # Generate a document ID or use any logic suitable for your application
+        # document_id = generate_document_id()
+        # # Set the review date to the current date and time
+        # review_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        # # Add data to Firestore
+        # firestore_data = {
+        #     'userID': user_id,
+        #     'plateID': plate_id,
+        #     'rating': star_ratings,
+        #     'comments': comments,
+        #     'name': user_name,
+        #     'rentalID': rental_id,
+        #     'reviewDate': review_date
+        # }
+        # crud.add('reviews', data=firestore_data, document_id=document_id)
+        return render_template('rental.html', start_date=StartDate, end_date=EndDate, rental_id=rental_id, car_type=car_make + car_model, license_plate=license_plate, total_amount=total_amount, timestamp=timestamp, message='You have successfully returned the car!')
     except Exception as e:
         return jsonify({'error': str(e)})
 
