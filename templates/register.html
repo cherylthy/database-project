@@ -8,10 +8,12 @@
 	</head>
 	<body>
 		<div class="register">
+			<a href="/" class="homepage-button">Home</a>
 			<h1>Register</h1>
 			<div class="links">
 				<a href="{{ url_for('login') }}">Login</a>
 				<a href="{{ url_for('register') }}" class="active">Register</a>
+				<a href="{{ url_for('admin_login') }}">Admin</a>
 			</div>
 			<form action="{{ url_for('register') }}" method="post" autocomplete="off">
 				<label for="username">
@@ -66,28 +68,11 @@
 					<!-- Content for the Terms and Conditions goes here -->
 					<p>These are the terms and conditions...</p>
 					</div>
-				</div>
-
-				<script>
-					// JavaScript to control the modal
-					const openTermsModal = document.getElementById("openTermsModal");
-					const termsModal = document.getElementById("termsModal");
-					const closeModalButton = document.getElementById("closeModal");
-				  
-					openTermsModal.addEventListener("click", function (e) {
-					  e.preventDefault(); // Prevent the default link behavior
-					  termsModal.style.display = "block";
-					});
-				  
-					closeModalButton.addEventListener("click", function () {
-					  termsModal.style.display = "none";
-					});
-				  </script>
-				  
-
+				</div>	  
 				<div class="msg">{{ msg }}</div>
 				<input type="submit" value="Register">
 			</form>
 		</div>
+		<script src="static/js/register.js"></script>
 	</body>
 </html>
