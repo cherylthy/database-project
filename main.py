@@ -451,34 +451,42 @@ def handle_booking():
 def load_rental(rental_id):
     try:
         cursor = mysql.get_db().cursor()
-        cursor.execute("SELECT CarInventory.car_make, CarInventory.car_model, CarInventory.license_plate, Rentals.StartDate, Rentals.EndDate, Rentals.TotalAmount, Rentals.Timestamp FROM CarInventory INNER JOIN Rentals ON CarInventory.license_plate = Rentals.PlateID WHERE RentalID = %s", (rental_id,))
+        # cursor.execute("SELECT CarInventory.car_make, CarInventory.car_model, CarInventory.license_plate, Rentals.StartDate, Rentals.EndDate, Rentals.TotalAmount, Rentals.Timestamp FROM CarInventory INNER JOIN Rentals ON CarInventory.license_plate = Rentals.PlateID WHERE RentalID = %s", (rental_id,))
+        cursor.execute('''SELECT R.user_id, R.license_plate, R.start_date, R.end_date, R.total_amount, R.timestamp, A.name, F.car_make, F.car_model
+                       FROM Rentals R
+                       INNER JOIN UserAccounts A ON R.user_id = A.user_id
+                       INNER JOIN CarInventory V ON R.license_plate = V.license_plate
+                       INNER JOIN CarInformation F ON V.car_model = F.car_model
+                       WHERE R.rental_id = %s''', (rental_id,))
         data = cursor.fetchone()
         cursor.close()
         if data:
-            car_make, car_model, license_plate, StartDate, EndDate, total_amount, timestamp = data
+            user_id, license_plate, StartDate, EndDate, total_amount, timestamp, name, car_make, car_model, = data
             
             
         # data = cursor.fetchone()
         # cursor.close()
+        '''this is from mysql'''
         # if data:
-        #     user_id = data['userID']
-        #     user_name = data['Name']
-        #     plate_id = data['PlateID']
+            # user_id = data['UserID']    # from UserAccount
+            # user_name = data['Name']    # from UserAccount
+            # plate_id = data['license_plate']
         # # Generate a document ID or use any logic suitable for your application
-        # document_id = generate_document_id()
-        # # Set the review date to the current date and time
+        '''this is for firebase'''
+        document_id = generate_document_id()
+        # Set the review date to the current date and time
         # review_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        # # Add data to Firestore
-        # firestore_data = {
-        #     'userID': user_id,
-        #     'plateID': plate_id,
-        #     'rating': star_ratings,
-        #     'comments': comments,
-        #     'name': user_name,
-        #     'rentalID': rental_id,
-        #     'reviewDate': review_date
-        # }
-        # crud.add('reviews', data=firestore_data, document_id=document_id)
+        # Add data to Firestore
+        firestore_data = {
+            # 'userID': user_id,
+            # 'plateID': plate_id,
+            # 'rating': star_ratings,
+            # 'comments': comments,
+            # 'name': user_name,
+            'rentalID': rental_id,
+            # 'reviewDate': review_date
+        }
+        crud.add('reviews', data=firestore_data, document_id=document_id)
         return render_template('rental.html', start_date=StartDate, end_date=EndDate, rental_id=rental_id, car_type=car_make + car_model, license_plate=license_plate, total_amount=total_amount, timestamp=timestamp, message='You have successfully returned the car!')
     except Exception as e:
         return jsonify({'error': str(e)})
