@@ -527,6 +527,7 @@ def upload_review():
         rental_id = session.get('rental_id')
 
         review_description = request.form.get('review_description')
+        selected_rating = request.form.get('rate')  # Retrieve the selected rating
 
         # Generate a document ID or use any logic suitable for your application
         '''this is for firebase'''
@@ -554,7 +555,7 @@ def upload_review():
             'plateID': plate_id,
             'comments': review_description,
             'name': user_name,
-            'rating': 2, # temp hardcode
+            'rating': selected_rating, # no longer hardcode
             'rentalID': rental_id,
             'reviewDate': SERVER_TIMESTAMP,
             'images': image_urls  # Include the list of image URLs in Firestore data

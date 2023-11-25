@@ -66,7 +66,7 @@
               <p style="text-align: center; margin-bottom:10px;"> Leave us a review!</p>
               <!-- houwei do the star ratings here -->
               <div class="center">
-                <div class="stars">
+                <div class="stars" id="star_rating">
                   <input type="radio" id="five" name="rate" value="5">
                   <label for="five"></label>
                   <input type="radio" id="four" name="rate" value="4">
@@ -81,7 +81,7 @@
                 </div>
               </div>
               <div class="form-group">
-                <input type="text" class="form-control" name="star_ratings" placeholder="Star Ratings">
+                <input type="hidden" name="star_ratings" id="selected_rating", value="">
               </div>
               <div class="form-group">
                 <textarea name="review_description" id="" cols="30" rows="7" class="form-control"
@@ -215,6 +215,18 @@
       form.style.display = (form.style.display === 'none') ? 'block' : 'none';
     }
   </script>
+  <script>
+    // Add click event listeners to each star
+    const stars = document.querySelectorAll('input[type="radio"]');
+    stars.forEach(star => {
+        star.addEventListener('click', function () {
+            const selected_rating = this.value;
+            // Update the hidden input value with the selected rating
+            // document.querySelector('.result').textContent = `Selected Rating: ${selected_rating}`;
+        });
+    });
+  </script>
+
 </body>
 
 </html>
