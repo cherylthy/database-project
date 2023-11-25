@@ -721,16 +721,16 @@ def delete_selected_users(selected_users):
 def admin_metrics():
     try:
         cursor = mysql.get_db().cursor()
-        cursor.execute("SELECT CONCAT(YEAR(StartDate), '-', LPAD(MONTH(StartDate), 2, '0')) AS month, SUM(TotalAmount) AS monthly_sales FROM Rentals GROUP BY month")
+        cursor.execute("SELECT CONCAT(YEAR(start_date), '-', LPAD(MONTH(start_date), 2, '0')) AS month, SUM(total_amount) AS monthly_sales FROM Rentals GROUP BY month")
         monthly_sales = cursor.fetchall()
         
-        cursor.execute("SELECT CONCAT(YEAR(StartDate), '-', LPAD(MONTH(StartDate), 2, '0')) AS month, COUNT(RentalId) AS monthly_count FROM Rentals GROUP BY month")
+        cursor.execute("SELECT CONCAT(YEAR(start_date), '-', LPAD(MONTH(start_date), 2, '0')) AS month, COUNT(rental_id) AS monthly_count FROM Rentals GROUP BY month")
         monthly_count = cursor.fetchall()
         
-        cursor.execute("SELECT SUM(TotalAmount) as yearly_sales, YEAR(StartDate) as start_month from Rentals GROUP BY YEAR(StartDate)")
+        cursor.execute("SELECT SUM(total_amount) as yearly_sales, YEAR(start_date) as start_month from Rentals GROUP BY YEAR(start_date)")
         yearly_sales = cursor.fetchall()
         
-        cursor.execute("SELECT COUNT(RentalId) as yearly_count, YEAR(StartDate) as start_month from Rentals GROUP BY YEAR(StartDate)")
+        cursor.execute("SELECT COUNT(rental_id) as yearly_count, YEAR(start_date) as start_month from Rentals GROUP BY YEAR(start_date)")
         yearly_count = cursor.fetchall()
         
         cursor.execute("SELECT COUNT(license_plate) as car_count FROM CarInventory")
