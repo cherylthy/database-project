@@ -759,14 +759,14 @@ def manage_users():
 
 def fetch_user_accounts():
     with mysql.get_db().cursor() as cursor:
-            cursor.execute("SELECT 'UserId', `Name`, `Age`, `PhoneNo`, `Email` FROM UserAccounts")
+            cursor.execute("SELECT 'user_id', `name`, `age`, `phone_no`, `email` FROM UserAccounts")
             data = cursor.fetchall()
     return data
 
 def delete_selected_users(selected_users):
     with mysql.get_db().cursor() as cursor:
         for userid in selected_users:
-            cursor.execute("DELETE FROM UserAccounts WHERE UserID = %s", (userid,))
+            cursor.execute("DELETE FROM UserAccounts WHERE user_id = %s", (userid,))
     mysql.get_db().commit()
     
     
