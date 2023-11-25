@@ -349,7 +349,7 @@ def display_car_details(car_id):
             car_make = row_dict['car_make']
             car_model = row_dict['car_model']
             body_type = row_dict['body_type']
-            # year = row_dict['year']
+            engine_size = row_dict['engine_size']
             color = row_dict['color']
             transmission_type = row_dict['transmission_type']
             # seats = row_dict['seats']
@@ -375,7 +375,7 @@ def display_car_details(car_id):
                                body_type=body_type, color=color, transmission_type=transmission_type, price=price, 
                                safety_features=safety_features, entertainment_features=entertainment_features, 
                                interior_features=interior_features, exterior_features=exterior_features, 
-                               image_path=image_path, car_id=car_id, colors=colors, reviews=reviews)
+                               image_path=image_path, engine_size=engine_size, car_id=car_id, colors=colors, reviews=reviews)
 
     except Exception as e:
         return jsonify({'error': str(e)})
@@ -394,15 +394,16 @@ def booking_page(car_id):
             email = userdetails[5]
         
         cursor = mysql.get_db().cursor()
-        cursor.execute("SELECT v.license_plate, v.car_model, f.car_make, f.body_type, f.daily_rate FROM CarInventory v INNER JOIN CarInformation f ON v.car_model = f.car_model WHERE license_plate = %s", (car_id,))
+        cursor.execute('''SELECT v.license_plate, f.car_make, v.car_model, f.daily_rate, i.image_path FROM ((CarInventory v INNER JOIN CarInformation f ON v.car_model = f.car_model) 
+                       INNER JOIN CarImage i ON v.car_model = i.car_model) WHERE license_plate = %s''', (car_id,))
         data = cursor.fetchone()
         cursor.close()
         if data:
             license_plate = data[0]
             car_make = data[1]
             car_model = data[2]
-            body_type = data[3]
-            price = data[4]
+            price = data[3]
+            image_path = data[4]
             
         cursor = mysql.get_db().cursor()
         cursor.execute("SELECT * FROM Rentals WHERE license_plate = %s", (car_id,))
@@ -420,7 +421,7 @@ def booking_page(car_id):
                 current_date += timedelta(days=1)
 
         return render_template('booking.html', license_plate=license_plate, car_make=car_make, car_model=car_model, 
-                               body_type=body_type, car_id=car_id, name=name, phone_no=phone_no, email=email, price=price, booked_dates=booked_dates)
+                               image_path=image_path, car_id=car_id, name=name, phone_no=phone_no, email=email, price=price, booked_dates=booked_dates)
 
     except Exception as e:
         return jsonify({'error': str(e)})
