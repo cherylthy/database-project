@@ -19,12 +19,16 @@
         <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/flaticon.css') }}">
         <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/icomoon.css') }}">
         <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
+
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/admin_dashboard.css') }}">
+        <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
       </head>
 <body>
     <div class="navbar">
         <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
         <a href="{{ url_for('manage_users') }}">Users</a>
-        <a href="{{ url_for('add_listing')}}" class="active">Create Listings</a>
+        <a href="{{ url_for('add_listing')}}" >Create Listings</a>
+        <a href="{{ url_for('admin_metrics') }}" class="active">Metrics</a>
         <a href="{{ url_for('logout') }}">Logout</a>
     </div>
        <section class="ftco-section ftco-no-pt bg-light">
@@ -40,6 +44,11 @@
                                             <div class="text pt-4" style="text-align: left";>
                                                 <div>
                                                     <p>Cars in Inventory: <span style="color: black">{{ car_count }}</span></p>
+                                                </div>
+                                                <br>
+                                                <div>
+                                                    <p>Most Rented Car</p>
+                                                    <p><span style="color: black">{{ top_car }}</span>, rented a total of <span style="color: black">{{ top_car_count }}</span> times</p>
                                                 </div>
                                                 <br>
                                                 <div>
