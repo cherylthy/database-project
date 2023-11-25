@@ -341,7 +341,7 @@ def cancel_booking():
 def display_car_details(car_id):
     try:
         cursor = mysql.get_db().cursor()
-        cursor.execute("SELECT * FROM CarInventory v INNER JOIN CarInformation f ON v.car_model = f.car_model WHERE license_plate = %s", (car_id,))
+        cursor.execute("SELECT * FROM CarInventory v INNER JOIN CarInformation f ON v.car_model = f.car_model INNER JOIN CarImage i ON v.car_model = i.car_model WHERE license_plate = %s", (car_id,))
         data = cursor.fetchone()
         cursor.close()
         if data:
@@ -362,19 +362,33 @@ def display_car_details(car_id):
             entertainment_features = row_dict['entertainment_features']
             interior_features = row_dict['interior_features']
             exterior_features = row_dict['exterior_features']
+            image_path = row_dict['image_path']
             
         cursor = mysql.get_db().cursor()
         cursor.execute("SELECT color, license_plate FROM CarInventory WHERE car_model = %s AND color != %s", (car_model, color,))
         colors = cursor.fetchall()
         cursor.close()
         
-        reviews = [review for review in all_reviews if review.get("plateID") == car_id]
+        # all_reviews = crud.get("reviews")
+        # reviews = [review for review in all_reviews if review.get("plateID") == car_id]
         
+        table = crud.db.collection("reviews")
+        print("t: ", table)
+        query = table.order_by("reviewDate")
+        print("q: ", query)
+        results = query.get()
+        print("r: ", results)
+        for doc in results:
+            print("Document data:", doc.to_dict())
+        # all_reviews = crud.get("reviews").orderByChild("timestamp")
+        reviews = [review for review in results if review.get("plateID") == car_id]
+        for review in reviews:
+            print("review: ", review)
         return render_template('listing.html', license_plate=license_plate, car_make=car_make, car_model=car_model, 
                                body_type=body_type, color=color, transmission_type=transmission_type, price=price, 
                                safety_features=safety_features, entertainment_features=entertainment_features, 
                                interior_features=interior_features, exterior_features=exterior_features, 
-                               car_id=car_id, colors=colors, reviews=reviews)
+                               image_path=image_path, car_id=car_id, colors=colors, reviews=reviews)
 
     except Exception as e:
         return jsonify({'error': str(e)})
@@ -553,6 +567,7 @@ def upload_review():
             'plateID': plate_id,
             'comments': review_description,
             'name': user_name,
+            'rating': 2, # temp hardcode
             'rentalID': rental_id,
             'reviewDate': SERVER_TIMESTAMP,
             'images': image_urls  # Include the list of image URLs in Firestore data
@@ -768,16 +783,16 @@ def delete_selected_users(selected_users):
 def admin_metrics():
     try:
         cursor = mysql.get_db().cursor()
-        cursor.execute("SELECT CONCAT(YEAR(StartDate), '-', LPAD(MONTH(StartDate), 2, '0')) AS month, SUM(TotalAmount) AS monthly_sales FROM Rentals GROUP BY month")
+        cursor.execute("SELECT CONCAT(YEAR(start_date), '-', LPAD(MONTH(start_date), 2, '0')) AS month, SUM(total_amount) AS monthly_sales FROM Rentals GROUP BY month")
         monthly_sales = cursor.fetchall()
         
-        cursor.execute("SELECT CONCAT(YEAR(StartDate), '-', LPAD(MONTH(StartDate), 2, '0')) AS month, COUNT(RentalId) AS monthly_count FROM Rentals GROUP BY month")
+        cursor.execute("SELECT CONCAT(YEAR(start_date), '-', LPAD(MONTH(start_date), 2, '0')) AS month, COUNT(rental_id) AS monthly_count FROM Rentals GROUP BY month")
         monthly_count = cursor.fetchall()
         
-        cursor.execute("SELECT SUM(TotalAmount) as yearly_sales, YEAR(StartDate) as start_month from Rentals GROUP BY YEAR(StartDate)")
+        cursor.execute("SELECT SUM(total_amount) as yearly_sales, YEAR(start_date) as start_month from Rentals GROUP BY YEAR(start_date)")
         yearly_sales = cursor.fetchall()
         
-        cursor.execute("SELECT COUNT(RentalId) as yearly_count, YEAR(StartDate) as start_month from Rentals GROUP BY YEAR(StartDate)")
+        cursor.execute("SELECT COUNT(rental_id) as yearly_count, YEAR(start_date) as start_month from Rentals GROUP BY YEAR(start_date)")
         yearly_count = cursor.fetchall()
         
         cursor.execute("SELECT COUNT(license_plate) as car_count FROM CarInventory")
