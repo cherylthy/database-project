@@ -33,12 +33,17 @@ mysql.init_app(app)
 app.secret_key = 'secret'
 Debug(app)
 
+def generate_document_id():
+    # Generate a random unique identifier
+    unique_id = str(uuid.uuid4())
+    return f"reviews-{unique_id}"
+
 @app.route('/')
 def select_all_from_table():
     try:
         # Fetch distinct car makes for the dropdown
         cursor = mysql.get_db().cursor()
-        cursor.execute("SELECT DISTINCT car_make FROM CarInventory")
+        cursor.execute("SELECT DISTINCT car_make FROM CarInformation")
         car_makes = [make[0] for make in cursor.fetchall()]
         
         # Get filtering and sorting parameters from the request
@@ -52,11 +57,11 @@ def select_all_from_table():
         offset = (page - 1) * items_per_page
 
         # Build the SQL query based on filtering and sorting parameters
-        query = "SELECT license_plate, car_make, car_model, daily_rate, image_path_1 FROM CarInventory"
+        query = "SELECT v.license_plate, f.car_make, v.car_model, f.daily_rate, i.image_path FROM ((CarInventory v INNER JOIN CarInformation f ON v.car_model = f.car_model) INNER JOIN CarImage i ON v.car_model = i.car_model)"
 
         # Check if there's a make_filter parameter
         if make_filter:
-            query += f" WHERE car_make = '{make_filter}'"
+            query += f" WHERE f.car_make = '{make_filter}'"
 
         query += f" ORDER BY {sort_by} {sort_order} LIMIT {offset}, {items_per_page}"
 
@@ -70,7 +75,7 @@ def select_all_from_table():
 
         # Check if there's a make_filter parameter
         if make_filter:
-            total_query += f" WHERE car_make = '{make_filter}'"
+            total_query += f" WHERE f.car_make = '{make_filter}'"
 
         cursor = mysql.get_db().cursor()
         cursor.execute(total_query)
@@ -222,7 +227,10 @@ def accounts():
             # return jsonify({'error': 'User not found'})
             pass
 
-        return render_template('account_page.html', data=data, booking_data=booking_data)
+        all_reviews = crud.get("reviews")
+        reviews = [review for review in all_reviews if review.get("userID") == user_id]
+
+        return render_template('account_page.html', data=data, booking_data=booking_data, reviews=reviews)
     
     except Exception as e:
         return jsonify({'error': str(e)})
@@ -290,7 +298,7 @@ def cancel_booking():
 def display_car_details(car_id):
     try:
         cursor = mysql.get_db().cursor()
-        cursor.execute("SELECT * FROM CarInventory WHERE license_plate = %s", (car_id,))
+        cursor.execute("SELECT * FROM CarInventory v INNER JOIN CarInformation f ON v.car_model = f.car_model WHERE license_plate = %s", (car_id,))
         data = cursor.fetchone()
         cursor.close()
         if data:
@@ -317,8 +325,7 @@ def display_car_details(car_id):
         colors = cursor.fetchall()
         cursor.close()
         
-        all_reviews = crud.get("reviews")
-        reviews = [review for review in all_reviews if review.get("carID") == car_id]
+        reviews = [review for review in all_reviews if review.get("plateID") == car_id]
         
         return render_template('listing.html', license_plate=license_plate, car_make=car_make, car_model=car_model, 
                                body_type=body_type, color=color, transmission_type=transmission_type, price=price, 
@@ -334,7 +341,7 @@ def booking_page(car_id):
     try:
         user_id = session['UserID']
         cursor = mysql.get_db().cursor()
-        cursor.execute("SELECT * FROM UserAccounts WHERE UserID = %s", (user_id,))
+        cursor.execute("SELECT * FROM UserAccounts WHERE user_id = %s", (user_id,))
         userdetails = cursor.fetchone()
         cursor.close()
         if userdetails:
@@ -343,19 +350,19 @@ def booking_page(car_id):
             email = userdetails[5]
         
         cursor = mysql.get_db().cursor()
-        cursor.execute("SELECT * FROM CarInventory WHERE license_plate = %s", (car_id,))
+        cursor.execute("SELECT * FROM CarInventory v INNER JOIN CarInformation f ON v.car_model = f.car_model WHERE license_plate = %s", (car_id,))
         data = cursor.fetchone()
         cursor.close()
         if data:
             license_plate = data[0]
             car_make = data[1]
             car_model = data[2]
-            year = data[3]
+            # year = data[3]
             body_type = data[4]
             price = data[16]
             
         cursor = mysql.get_db().cursor()
-        cursor.execute("SELECT * FROM Rentals WHERE PlateID = %s", (car_id,))
+        cursor.execute("SELECT * FROM Rentals WHERE plate_id = %s", (car_id,))
         rentals = cursor.fetchall()
         cursor.close()
         
@@ -370,7 +377,7 @@ def booking_page(car_id):
                 current_date += timedelta(days=1)
 
         return render_template('booking.html', license_plate=license_plate, car_make=car_make, car_model=car_model, 
-                               year=year, body_type=body_type, car_id=car_id, name=name, phone_no=phone_no, email=email, price=price, booked_dates=booked_dates)
+                               body_type=body_type, car_id=car_id, name=name, phone_no=phone_no, email=email, price=price, booked_dates=booked_dates)
 
     except Exception as e:
         return jsonify({'error': str(e)})
@@ -440,18 +447,47 @@ def handle_booking():
     except Exception as e:
         return jsonify({'error': str(e)})
     
-@app.route('/rental/<rental_id>')
+@app.route('/rental/<rental_id>', methods=['GET', 'POST'])
 def load_rental(rental_id):
     try:
         cursor = mysql.get_db().cursor()
-        cursor.execute("SELECT CarInventory.car_make, CarInventory.car_model, CarInventory.license_plate, Rentals.StartDate, Rentals.EndDate FROM CarInventory INNER JOIN Rentals ON CarInventory.license_plate = Rentals.PlateID WHERE RentalID = %s", (rental_id,))
+        # cursor.execute("SELECT CarInventory.car_make, CarInventory.car_model, CarInventory.license_plate, Rentals.StartDate, Rentals.EndDate, Rentals.TotalAmount, Rentals.Timestamp FROM CarInventory INNER JOIN Rentals ON CarInventory.license_plate = Rentals.PlateID WHERE RentalID = %s", (rental_id,))
+        cursor.execute('''SELECT R.user_id, R.license_plate, R.start_date, R.end_date, R.total_amount, R.timestamp, A.name, F.car_make, F.car_model
+                       FROM Rentals R
+                       INNER JOIN UserAccounts A ON R.user_id = A.user_id
+                       INNER JOIN CarInventory V ON R.license_plate = V.license_plate
+                       INNER JOIN CarInformation F ON V.car_model = F.car_model
+                       WHERE R.rental_id = %s''', (rental_id,))
         data = cursor.fetchone()
         cursor.close()
         if data:
-            car_make, car_model, license_plate, StartDate, EndDate = data
+            user_id, license_plate, StartDate, EndDate, total_amount, timestamp, name, car_make, car_model, = data
             
-            return render_template('rental.html', start_date=StartDate, end_date=EndDate, rental_id=rental_id, car_type=car_make + car_model, license_plate=license_plate)
-
+            
+        # data = cursor.fetchone()
+        # cursor.close()
+        '''this is from mysql'''
+        # if data:
+            # user_id = data['UserID']    # from UserAccount
+            # user_name = data['Name']    # from UserAccount
+            # plate_id = data['license_plate']
+        # # Generate a document ID or use any logic suitable for your application
+        '''this is for firebase'''
+        document_id = generate_document_id()
+        # Set the review date to the current date and time
+        # review_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        # Add data to Firestore
+        firestore_data = {
+            # 'userID': user_id,
+            # 'plateID': plate_id,
+            # 'rating': star_ratings,
+            # 'comments': comments,
+            # 'name': user_name,
+            'rentalID': rental_id,
+            # 'reviewDate': review_date
+        }
+        crud.add('reviews', data=firestore_data, document_id=document_id)
+        return render_template('rental.html', start_date=StartDate, end_date=EndDate, rental_id=rental_id, car_type=car_make + car_model, license_plate=license_plate, total_amount=total_amount, timestamp=timestamp, message='You have successfully returned the car!')
     except Exception as e:
         return jsonify({'error': str(e)})
 
@@ -598,7 +634,33 @@ def delete_selected_users(selected_users):
         for userid in selected_users:
             cursor.execute("DELETE FROM UserAccounts WHERE UserID = %s", (userid,))
     mysql.get_db().commit()
+    
+    
+@app.route('/admin_metrics', methods=['GET'])
+def admin_metrics():
+    try:
+        cursor = mysql.get_db().cursor()
+        cursor.execute("SELECT CONCAT(YEAR(StartDate), '-', LPAD(MONTH(StartDate), 2, '0')) AS month, SUM(TotalAmount) AS monthly_sales FROM Rentals GROUP BY month")
+        monthly_sales = cursor.fetchall()
+        
+        cursor.execute("SELECT CONCAT(YEAR(StartDate), '-', LPAD(MONTH(StartDate), 2, '0')) AS month, COUNT(RentalId) AS monthly_count FROM Rentals GROUP BY month")
+        monthly_count = cursor.fetchall()
+        
+        cursor.execute("SELECT SUM(TotalAmount) as yearly_sales, YEAR(StartDate) as start_month from Rentals GROUP BY YEAR(StartDate)")
+        yearly_sales = cursor.fetchall()
+        
+        cursor.execute("SELECT COUNT(RentalId) as yearly_count, YEAR(StartDate) as start_month from Rentals GROUP BY YEAR(StartDate)")
+        yearly_count = cursor.fetchall()
+        
+        cursor.execute("SELECT COUNT(license_plate) as car_count FROM CarInventory")
+        car_count = cursor.fetchone()
+        car_count = car_count[0]
+        cursor.close()
+        
+        return render_template('admin_metrics.html', monthly_sales=monthly_sales, monthly_count=monthly_count, yearly_sales=yearly_sales, yearly_count=yearly_count, car_count=car_count)
 
+    except Exception as e:
+        return jsonify({'error': str(e)})
     
 
 @app.route('/all-reviews')
