@@ -578,31 +578,41 @@ def add_listing():
         engine_size = request.form['engine_size']
         transmission_type = request.form['transmission_type']
         price = request.form['price']
+        color = request.form['color']
 
-        # Insert into CarInformation
-        car_info_query = """
-            INSERT INTO CarInformation (car_model, car_make, engine_size, transmission_type, body_type, daily_rate)
-            VALUES (%s, %s, %s, %s, %s, %s)
-        """
-        car_info_data = (car_model, car_make, engine_size, transmission_type, body_type, price)
-
-        # Insert into CarInventory
-        car_inventory_query = """
-            INSERT INTO CarInventory (license_plate, car_model, color)
-            VALUES (%s, %s, %s)
-        """
-        car_inventory_data = (license_plate, car_model, 'blue')  # Assuming a default color for simplicity
-
-        # Execute the queries
+        # Check if car_model exists in CarInformation
         cursor = mysql.get_db().cursor()
-        cursor.execute(car_info_query, car_info_data)
-        cursor.execute(car_inventory_query, car_inventory_data)
+        cursor.execute("SELECT * FROM CarInformation WHERE car_model = %s", (car_model,))
+        existing_car = cursor.fetchone()
 
-        # Commit the changes
-        mysql.get_db().commit()
+        if existing_car:
+            # Car model exists in CarInformation, insert into CarInventory
+            car_inventory_query = """
+                INSERT INTO CarInventory (license_plate, car_model, color)
+                VALUES (%s, %s, %s)
+            """
+            car_inventory_data = (license_plate, car_model, color)  # Default color for simplicity
 
-        # Close the cursor
-        cursor.close()
+            cursor.execute(car_inventory_query, car_inventory_data)
+            mysql.get_db().commit()
+
+        else:
+            # Car model doesn't exist in CarInformation, insert into both tables
+            car_info_query = """
+                INSERT INTO CarInformation (car_model, car_make, engine_size, transmission_type, body_type, daily_rate)
+                VALUES (%s, %s, %s, %s, %s, %s)
+            """
+            car_info_data = (car_model, car_make, engine_size, transmission_type, body_type, price)
+
+            car_inventory_query = """
+                INSERT INTO CarInventory (license_plate, car_model, color)
+                VALUES (%s, %s, %s)
+            """
+            car_inventory_data = (license_plate, car_model, color)
+
+            cursor.execute(car_info_query, car_info_data)
+            cursor.execute(car_inventory_query, car_inventory_data)
+            mysql.get_db.commit()
 
         # Redirect to the same page after successful form submission
         return redirect(url_for('add_listing'))
@@ -613,11 +623,28 @@ def update_car_inventory(license_plate, car_make, car_model, body_type, engine_s
     try:
         cursor = mysql.get_db().cursor()
 
-        # Use placeholders in the SQL query to avoid SQL injection
-        query = "UPDATE CarInventory SET car_make=%s, car_model=%s, body_type=%s, engine_size=%s, transmission_type=%s, daily_rate=%s WHERE license_plate=%s"
-        
-        # Execute the update query
-        cursor.execute(query, (car_make, car_model, body_type, engine_size, transmission_type, daily_rate, license_plate))
+        # Update the CarInventory table based on the provided information
+        update_inventory_query = """
+            UPDATE CarInventory
+            SET car_model = %s
+            WHERE license_plate = %s
+        """
+        cursor.execute(update_inventory_query, (car_model, license_plate))
+
+        # Update the CarInformation table based on the provided information
+        update_information_query = """
+            UPDATE CarInformation
+            SET
+                car_make = %s,
+                car_model = %s,
+                body_type = %s,
+                engine_size = %s,
+                transmission_type = %s,
+                daily_rate = %s
+            WHERE car_model = %s
+        """
+        cursor.execute(update_information_query, (car_make, car_model, body_type, engine_size, transmission_type, daily_rate, car_model))
+
         
         # Commit the changes to the database
         mysql.get_db().commit()
