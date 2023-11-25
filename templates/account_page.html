@@ -183,73 +183,40 @@
                                             </div>
                                         </div>
                                         {% endfor %}
-                                    </div>
-                                    <div class="col-md-5">
-                                        <div class="rating-wrap">
-                                            <h3 class="head">Give a Review</h3>
-                                            <div class="wrap">
-                                                <p class="star">
-                                                    <span>
-                                                        <i class="ion-ios-star"></i>
-                                                        <i class="ion-ios-star"></i>
-                                                        <i class="ion-ios-star"></i>
-                                                        <i class="ion-ios-star"></i>
-                                                        <i class="ion-ios-star"></i>
-                                                        (98%)
-                                                    </span>
-                                                    <span>20 Reviews</span>
+                                        {% endfor %}
+                                        <h4>Reviews</h4>
+                                        {% if reviews %}
+                                            {% for review in reviews %}
+                                            <br>
+                                            <div class="review">
+                                                <div class="desc">
+                                                <h5 style="display: inline-block; width: 100%;">
+                                                    <span>{{ review["name"] }}</span>
+                                                    <span style="float: right; font-size: 15px; color: rgba(0, 0, 0, 0.3); margin-top: 5px;">{{ review["reviewDate"].strftime("%Y-%m-%d %H:%M") }}</span>
+                                                </h5>
+                                                <p class="star" style="color: #1089ff;">
+                                                    {% for _ in range(review["rating"]) %}
+                                                    <i class="ion-ios-star"></i>
+                                                    {% endfor %}
+                                                    {% for _ in range(5 - review["rating"]) %}
+                                                    <i class="ion-ios-star-outline"></i>
+                                                    {% endfor %}
                                                 </p>
-                                                <p class="star">
-                                                    <span>
-                                                        <i class="ion-ios-star"></i>
-                                                        <i class="ion-ios-star"></i>
-                                                        <i class="ion-ios-star"></i>
-                                                        <i class="ion-ios-star"></i>
-                                                        <i class="ion-ios-star"></i>
-                                                        (85%)
-                                                    </span>
-                                                    <span>10 Reviews</span>
-                                                </p>
-                                                <p class="star">
-                                                    <span>
-                                                        <i class="ion-ios-star"></i>
-                                                        <i class="ion-ios-star"></i>
-                                                        <i class="ion-ios-star"></i>
-                                                        <i class="ion-ios-star"></i>
-                                                        <i class="ion-ios-star"></i>
-                                                        (70%)
-                                                    </span>
-                                                    <span>5 Reviews</span>
-                                                </p>
-                                                <p class="star">
-                                                    <span>
-                                                        <i class="ion-ios-star"></i>
-                                                        <i class="ion-ios-star"></i>
-                                                        <i class="ion-ios-star"></i>
-                                                        <i class="ion-ios-star"></i>
-                                                        <i class="ion-ios-star"></i>
-                                                        (10%)
-                                                    </span>
-                                                    <span>0 Reviews</span>
-                                                </p>
-                                                <p class="star">
-                                                    <span>
-                                                        <i class="ion-ios-star"></i>
-                                                        <i class="ion-ios-star"></i>
-                                                        <i class="ion-ios-star"></i>
-                                                        <i class="ion-ios-star"></i>
-                                                        <i class="ion-ios-star"></i>
-                                                        (0%)
-                                                    </span>
-                                                    <span>0 Reviews</span>
-                                                </p>
+                                                <p>{{ review["comments"] }}</p>
+                                                {% if review["images"] %}
+                                                <img src="{{ review["images"] }}" style="max-width: 100px; max-height: 100px; margin-left: 10px;">
+                                                {% endif %}
+                                                <hr>
+                                                </div>
                                             </div>
-                                        </div>
+                                            {% endfor %}
+                                        {% else %}
+                                        {% endif %}
+                                        <p>No Reviews Yet</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        {% endfor %}
                     </div>
                 </div>
             </div>
