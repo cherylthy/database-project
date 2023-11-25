@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>View Booking</title>
+        <title>Metrics</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         
@@ -19,9 +19,14 @@
         <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/flaticon.css') }}">
         <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/icomoon.css') }}">
         <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
-        {% include 'navbar.html' %}
       </head>
 <body>
+    <div class="navbar">
+        <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('manage_users') }}">Users</a>
+        <a href="{{ url_for('add_listing')}}" class="active">Create Listings</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
        <section class="ftco-section ftco-no-pt bg-light">
           <div class="container" style="padding-top: 100px;">
               <div class="row no-gutters">

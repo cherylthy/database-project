@@ -30,7 +30,7 @@
       <div class="container">
         <div class="row no-gutters slider-text js-fullheight align-items-end justify-content-start">
           <div class="col-md-9 ftco-animate pb-5">
-          	<p class="breadcrumbs"><span class="mr-2"><a href="index.html">Home <i class="ion-ios-arrow-forward"></i></a></span> <span>Cars <i class="ion-ios-arrow-forward"></i></span></p>
+          	<p class="breadcrumbs"><span class="mr-2"><a href="/">Home <i class="ion-ios-arrow-forward"></i></a></span> <span>Cars <i class="ion-ios-arrow-forward"></i></span></p>
             <h1 class="mb-3 bread">Choose Your Car</h1>
           </div>
         </div>
@@ -38,31 +38,32 @@
     </section>
 
     <!-- Filter and Sort Button -->
-  
-    <form method="get" action="{{ url_for('select_all_from_table') }}">
-      <label for="make">Filter by Make:</label>
-      <select name="make" id="make" class="selectpicker" multiple>
-          <option value="">All Makes</option>
-            {% for make in car_makes %}
-              <option value="{{ make }}">{{ make }}</option>
-            {% endfor %}
-      </select>
-
-      <label for="sort_by">Sort by:</label>
-      <select name="sort_by" id="sort_by">
-          <option value="car_make">Make</option>
-          <option value="car_model">Model</option>
-          <option value="price">Price</option>
-      </select>
-
-      <label for="sort_order">Sort order:</label>
-        <select name="sort_order" id="sort_order">
-            <option value="asc">Ascending</option>
-            <option value="desc">Descending</option>
+    <div class="row pt-3 pb-3" style="place-content: space-evenly;">
+      <form method="get" action="{{ url_for('select_all_from_table') }}">
+        <label for="make">Filter by Make:</label>
+        <select name="make" id="make" class="selectpicker" multiple>
+            <option value="">All Makes</option>
+              {% for make in car_makes %}
+                <option value="{{ make }}">{{ make }}</option>
+              {% endfor %}
         </select>
 
-      <button type="submit" class="btn ">Apply</button>
-    </form>
+        <label for="sort_by">Sort by:</label>
+        <select name="sort_by" id="sort_by">
+            <option value="car_make">Make</option>
+            <option value="car_model">Model</option>
+            <option value="price">Price</option>
+        </select>
+
+        <label for="sort_order">Sort order:</label>
+          <select name="sort_order" id="sort_order">
+              <option value="asc">Ascending</option>
+              <option value="desc">Descending</option>
+          </select>
+
+        <button type="submit" class="btn ">Apply</button>
+      </form>
+    </div>
 
 
     <!-- Dynamic Car Listing section -->
@@ -108,71 +109,7 @@
             </ul>
         </div>
     </div>
-  </div>
-
-  <!-- Footer -->
-    <footer class="ftco-footer ftco-bg-dark ftco-section">
-      <div class="container">
-        <div class="row mb-5">
-          <div class="col-md">
-            <div class="ftco-footer-widget mb-4">
-              <h2 class="ftco-heading-2"><a href="#" class="logo">Car<span>book</span></a></h2>
-              <p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
-              <ul class="ftco-footer-social list-unstyled float-md-left float-lft mt-5">
-                <li class="ftco-animate"><a href="#"><span class="icon-twitter"></span></a></li>
-                <li class="ftco-animate"><a href="#"><span class="icon-facebook"></span></a></li>
-                <li class="ftco-animate"><a href="#"><span class="icon-instagram"></span></a></li>
-              </ul>
-            </div>
-          </div>
-          <div class="col-md">
-            <div class="ftco-footer-widget mb-4 ml-md-5">
-              <h2 class="ftco-heading-2">Information</h2>
-              <ul class="list-unstyled">
-                <li><a href="#" class="py-2 d-block">About</a></li>
-                <li><a href="#" class="py-2 d-block">Services</a></li>
-                <li><a href="#" class="py-2 d-block">Term and Conditions</a></li>
-                <li><a href="#" class="py-2 d-block">Best Price Guarantee</a></li>
-                <li><a href="#" class="py-2 d-block">Privacy &amp; Cookies Policy</a></li>
-              </ul>
-            </div>
-          </div>
-          <div class="col-md">
-             <div class="ftco-footer-widget mb-4">
-              <h2 class="ftco-heading-2">Customer Support</h2>
-              <ul class="list-unstyled">
-                <li><a href="#" class="py-2 d-block">FAQ</a></li>
-                <li><a href="#" class="py-2 d-block">Payment Option</a></li>
-                <li><a href="#" class="py-2 d-block">Booking Tips</a></li>
-                <li><a href="#" class="py-2 d-block">How it works</a></li>
-                <li><a href="#" class="py-2 d-block">Contact Us</a></li>
-              </ul>
-            </div>
-          </div>
-          <div class="col-md">
-            <div class="ftco-footer-widget mb-4">
-            	<h2 class="ftco-heading-2">Have a Questions?</h2>
-            	<div class="block-23 mb-3">
-	              <ul>
-	                <li><span class="icon icon-map-marker"></span><span class="text">203 Fake St. Mountain View, San Francisco, California, USA</span></li>
-	                <li><a href="#"><span class="icon icon-phone"></span><span class="text">+2 392 3929 210</span></a></li>
-	                <li><a href="#"><span class="icon icon-envelope"></span><span class="text">info@yourdomain.com</span></a></li>
-	              </ul>
-	            </div>
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-12 text-center">
-
-            <p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-  Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="icon-heart color-danger" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
-  <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p>
-          </div>
-        </div>
-      </div>
-    </footer>
-    
+  </div>   
   
 
   <!-- loader -->
