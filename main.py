@@ -339,7 +339,7 @@ def cancel_booking():
 def display_car_details(car_id):
     try:
         cursor = mysql.get_db().cursor()
-        cursor.execute("SELECT * FROM CarInventory v INNER JOIN CarInformation f ON v.car_model = f.car_model WHERE license_plate = %s", (car_id,))
+        cursor.execute("SELECT * FROM CarInventory v INNER JOIN CarInformation f ON v.car_model = f.car_model INNER JOIN CarImage i ON v.car_model = i.car_model WHERE license_plate = %s", (car_id,))
         data = cursor.fetchone()
         cursor.close()
         if data:
@@ -360,19 +360,23 @@ def display_car_details(car_id):
             entertainment_features = row_dict['entertainment_features']
             interior_features = row_dict['interior_features']
             exterior_features = row_dict['exterior_features']
+            image_path = row_dict['image_path']
             
         cursor = mysql.get_db().cursor()
         cursor.execute("SELECT color, license_plate FROM CarInventory WHERE car_model = %s AND color != %s", (car_model, color,))
         colors = cursor.fetchall()
         cursor.close()
         
+        all_reviews = crud.get("reviews")
         reviews = [review for review in all_reviews if review.get("plateID") == car_id]
+        
+        print(reviews[4]["images"])
         
         return render_template('listing.html', license_plate=license_plate, car_make=car_make, car_model=car_model, 
                                body_type=body_type, color=color, transmission_type=transmission_type, price=price, 
                                safety_features=safety_features, entertainment_features=entertainment_features, 
                                interior_features=interior_features, exterior_features=exterior_features, 
-                               car_id=car_id, colors=colors, reviews=reviews)
+                               image_path=image_path, car_id=car_id, colors=colors, reviews=reviews)
 
     except Exception as e:
         return jsonify({'error': str(e)})
@@ -549,6 +553,7 @@ def upload_review():
             'userID': user_id,
             'plateID': plate_id,
             'comments': review_description,
+            'rating': 2,
             'name': user_name,
             'rentalID': rental_id,
             'reviewDate': review_date,
@@ -562,10 +567,6 @@ def upload_review():
     
     except Exception as e:
             return jsonify({'error': str(e)})
-
-if __name__ == '__main__':
-    app.run(debug=True)
-
 
 @app.route('/create_listings', methods=['GET', 'POST'])
 def add_listing():
