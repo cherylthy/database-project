@@ -394,19 +394,18 @@ def booking_page(car_id):
             email = userdetails[5]
         
         cursor = mysql.get_db().cursor()
-        cursor.execute("SELECT * FROM CarInventory v INNER JOIN CarInformation f ON v.car_model = f.car_model WHERE license_plate = %s", (car_id,))
+        cursor.execute("SELECT v.license_plate, v.car_model, f.car_make, f.body_type, f.daily_rate FROM CarInventory v INNER JOIN CarInformation f ON v.car_model = f.car_model WHERE license_plate = %s", (car_id,))
         data = cursor.fetchone()
         cursor.close()
         if data:
             license_plate = data[0]
             car_make = data[1]
             car_model = data[2]
-            # year = data[3]
-            body_type = data[4]
-            price = data[16]
+            body_type = data[3]
+            price = data[4]
             
         cursor = mysql.get_db().cursor()
-        cursor.execute("SELECT * FROM Rentals WHERE plate_id = %s", (car_id,))
+        cursor.execute("SELECT * FROM Rentals WHERE license_plate = %s", (car_id,))
         rentals = cursor.fetchall()
         cursor.close()
         
