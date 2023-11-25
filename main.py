@@ -2,7 +2,6 @@ from flask import Flask, render_template, jsonify, request, redirect, url_for, s
 from firebase import Firebase
 from flaskext.mysql import MySQL
 import uuid
-import MySQLdb.cursors
 import MySQLdb.cursors, re, hashlib
 from flask_debug import Debug
 from functools import wraps
@@ -13,6 +12,9 @@ from flask_paginate import Pagination
 from datetime import datetime
 from firebase_admin import storage
 import os
+import firestore
+from google.cloud.firestore_v1 import SERVER_TIMESTAMP
+
 
 app = Flask(__name__)
 
@@ -73,7 +75,7 @@ def retrieve_image(image_name):
     blob = bucket.blob(image_path)
 
     # Download the image to a temporary file
-    temp_file_path = f"/tmp/{image_name}"  # You may need to adjust the path based on your environment
+    temp_file_path = f"/static/assets/{image_name}"  # You may need to adjust the path based on your environment
     blob.download_to_filename(temp_file_path)
 
     # Send the image file in the response
@@ -339,7 +341,7 @@ def cancel_booking():
 def display_car_details(car_id):
     try:
         cursor = mysql.get_db().cursor()
-        cursor.execute("SELECT * FROM CarInventory v INNER JOIN CarInformation f ON v.car_model = f.car_model INNER JOIN CarImage i ON v.car_model = i.car_model WHERE license_plate = %s", (car_id,))
+        cursor.execute("SELECT * FROM CarInventory v INNER JOIN CarInformation f ON v.car_model = f.car_model WHERE license_plate = %s", (car_id,))
         data = cursor.fetchone()
         cursor.close()
         if data:
@@ -360,23 +362,19 @@ def display_car_details(car_id):
             entertainment_features = row_dict['entertainment_features']
             interior_features = row_dict['interior_features']
             exterior_features = row_dict['exterior_features']
-            image_path = row_dict['image_path']
             
         cursor = mysql.get_db().cursor()
         cursor.execute("SELECT color, license_plate FROM CarInventory WHERE car_model = %s AND color != %s", (car_model, color,))
         colors = cursor.fetchall()
         cursor.close()
         
-        all_reviews = crud.get("reviews")
         reviews = [review for review in all_reviews if review.get("plateID") == car_id]
-        
-        print(reviews[4]["images"])
         
         return render_template('listing.html', license_plate=license_plate, car_make=car_make, car_model=car_model, 
                                body_type=body_type, color=color, transmission_type=transmission_type, price=price, 
                                safety_features=safety_features, entertainment_features=entertainment_features, 
                                interior_features=interior_features, exterior_features=exterior_features, 
-                               image_path=image_path, car_id=car_id, colors=colors, reviews=reviews)
+                               car_id=car_id, colors=colors, reviews=reviews)
 
     except Exception as e:
         return jsonify({'error': str(e)})
@@ -533,8 +531,9 @@ def upload_review():
         '''this is for firebase'''
         document_id = generate_document_id()
         # Set the review date to the current date and time
-        current_date = datetime.now().date()
-        review_date = current_date.strftime('%Y-%m-%d')
+        current_date = datetime.now()
+        review_date = current_date.strftime('%Y-%m-%d %H:%M:%S')
+
         # Access uploaded files
         images = request.files.getlist('image[]')
 
@@ -553,11 +552,11 @@ def upload_review():
             'userID': user_id,
             'plateID': plate_id,
             'comments': review_description,
-            'rating': 2,
             'name': user_name,
             'rentalID': rental_id,
-            'reviewDate': review_date,
+            'reviewDate': SERVER_TIMESTAMP,
             'images': image_urls  # Include the list of image URLs in Firestore data
+
         }
 
         crud.add('reviews', data=firestore_data, document_id=document_id)
@@ -567,6 +566,7 @@ def upload_review():
     
     except Exception as e:
             return jsonify({'error': str(e)})
+
 
 @app.route('/create_listings', methods=['GET', 'POST'])
 def add_listing():
@@ -721,16 +721,16 @@ def delete_selected_users(selected_users):
 def admin_metrics():
     try:
         cursor = mysql.get_db().cursor()
-        cursor.execute("SELECT CONCAT(YEAR(start_date), '-', LPAD(MONTH(start_date), 2, '0')) AS month, SUM(total_amount) AS monthly_sales FROM Rentals GROUP BY month")
+        cursor.execute("SELECT CONCAT(YEAR(StartDate), '-', LPAD(MONTH(StartDate), 2, '0')) AS month, SUM(TotalAmount) AS monthly_sales FROM Rentals GROUP BY month")
         monthly_sales = cursor.fetchall()
         
-        cursor.execute("SELECT CONCAT(YEAR(start_date), '-', LPAD(MONTH(start_date), 2, '0')) AS month, COUNT(rental_id) AS monthly_count FROM Rentals GROUP BY month")
+        cursor.execute("SELECT CONCAT(YEAR(StartDate), '-', LPAD(MONTH(StartDate), 2, '0')) AS month, COUNT(RentalId) AS monthly_count FROM Rentals GROUP BY month")
         monthly_count = cursor.fetchall()
         
-        cursor.execute("SELECT SUM(total_amount) as yearly_sales, YEAR(start_date) as start_month from Rentals GROUP BY YEAR(start_date)")
+        cursor.execute("SELECT SUM(TotalAmount) as yearly_sales, YEAR(StartDate) as start_month from Rentals GROUP BY YEAR(StartDate)")
         yearly_sales = cursor.fetchall()
         
-        cursor.execute("SELECT COUNT(rental_id) as yearly_count, YEAR(start_date) as start_month from Rentals GROUP BY YEAR(start_date)")
+        cursor.execute("SELECT COUNT(RentalId) as yearly_count, YEAR(StartDate) as start_month from Rentals GROUP BY YEAR(StartDate)")
         yearly_count = cursor.fetchall()
         
         cursor.execute("SELECT COUNT(license_plate) as car_count FROM CarInventory")
