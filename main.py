@@ -528,6 +528,10 @@ def upload_review():
 
         review_description = request.form.get('review_description')
         selected_rating = request.form.get('rate')  # Retrieve the selected rating
+        if selected_rating is not None and selected_rating.isdigit():
+            selected_rating = int(selected_rating)
+        else:
+            selected_rating = 0
 
         # Generate a document ID or use any logic suitable for your application
         '''this is for firebase'''
@@ -555,7 +559,7 @@ def upload_review():
             'plateID': plate_id,
             'comments': review_description,
             'name': user_name,
-            'rating': selected_rating, # no longer hardcode
+            'rating': selected_rating,
             'rentalID': rental_id,
             'reviewDate': SERVER_TIMESTAMP,
             'images': image_urls  # Include the list of image URLs in Firestore data
