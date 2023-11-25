@@ -61,7 +61,7 @@
             </div>
           </div>
           <div class="col-md-8 block-9 mb-md-5">
-            <form action="/upload" method="post" class="bg-light p-5 contact-form">
+            <form action="/upload" method="post" class="bg-light p-5 contact-form" enctype="multipart/form-data">
               <p style="text-align: center;"> Car Officially Returned!</p>
               <p style="text-align: center; margin-bottom:10px;"> Leave us a review!</p>
               <!-- houwei do the star ratings here -->
@@ -84,7 +84,7 @@
                 <input type="text" class="form-control" name="star_ratings" placeholder="Star Ratings">
               </div>
               <div class="form-group">
-                <textarea name="" id="" cols="30" rows="7" name="review_description" class="form-control"
+                <textarea name="review_description" id="" cols="30" rows="7" class="form-control"
                   placeholder="Message"></textarea>
               </div>
               <div class="form-group">

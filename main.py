@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request, redirect, url_for, session
+from flask import Flask, render_template, jsonify, request, redirect, url_for, session, send_file
 from firebase import Firebase
 from flaskext.mysql import MySQL
 import uuid
@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 from flask_paginate import Pagination
 from datetime import datetime
 from firebase_admin import storage
-
+import os
 
 app = Flask(__name__)
 
@@ -52,7 +52,7 @@ def upload_image_to_storage(image):
     bucket = storage.bucket()
     
     # Generate a unique filename or use other logic
-    filename = f"images/{generate_unique_filename(image.filename)}"
+    filename = f"review_images/{generate_unique_filename(image.filename)}"
     
     blob = bucket.blob(filename)
     blob.upload_from_string(image.read(), content_type=image.content_type)
@@ -61,6 +61,23 @@ def upload_image_to_storage(image):
     image_url = blob.public_url
 
     return image_url
+
+@app.route('/retrieve_image/<image_name>')
+def retrieve_image(image_name):
+    bucket = storage.bucket()
+
+    # Specify the path to the image in the storage bucket
+    image_path = f"review_images/{image_name}"
+
+    # Create a blob object
+    blob = bucket.blob(image_path)
+
+    # Download the image to a temporary file
+    temp_file_path = f"/tmp/{image_name}"  # You may need to adjust the path based on your environment
+    blob.download_to_filename(temp_file_path)
+
+    # Send the image file in the response
+    return send_file(temp_file_path, as_attachment=True)
 
 @app.route('/')
 def select_all_from_table():
