@@ -539,7 +539,11 @@ def admin_dashboard():
 
     if request.method == 'GET':
         cursor = mysql.get_db().cursor()
-        cursor.execute("SELECT `license_plate`, `car_make`, `car_model`, `body_type`, `engine_size`, `transmission_type`,  `daily_rate` FROM CarInventory")
+        cursor.execute("""
+                SELECT cinv.license_plate, ci.car_make, ci.car_model, ci.body_type, ci.engine_size, ci.transmission_type, ci.daily_rate
+                FROM CarInformation ci
+                INNER JOIN CarInventory cinv ON ci.car_model = cinv.car_model
+            """)
         data = cursor.fetchall()
         cursor.close()
 
