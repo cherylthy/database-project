@@ -579,15 +579,34 @@ def add_listing():
         transmission_type = request.form['transmission_type']
         price = request.form['price']
 
+        # Insert into CarInformation
+        car_info_query = """
+            INSERT INTO CarInformation (car_model, car_make, engine_size, transmission_type, body_type, daily_rate)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """
+        car_info_data = (car_model, car_make, engine_size, transmission_type, body_type, price)
+
+        # Insert into CarInventory
+        car_inventory_query = """
+            INSERT INTO CarInventory (license_plate, car_model, color)
+            VALUES (%s, %s, %s)
+        """
+        car_inventory_data = (license_plate, car_model, 'blue')  # Assuming a default color for simplicity
+
+        # Execute the queries
         cursor = mysql.get_db().cursor()
-        
-        cursor.execute('INSERT INTO CarInventory VALUES (%s, %s, %s, %s, NULL, NULL, NULL, %s, NULL, %s, NULL, NULL, NULL, NULL, NULL, NULL, %s)', (license_plate, car_make, car_model, body_type, engine_size, transmission_type, price))
+        cursor.execute(car_info_query, car_info_data)
+        cursor.execute(car_inventory_query, car_inventory_data)
+
+        # Commit the changes
         mysql.get_db().commit()
-        # Success message or redirect
+
+        # Close the cursor
         cursor.close()
+
         # Redirect to the same page after successful form submission
         return redirect(url_for('add_listing'))
-    
+
     return render_template('create_listings.html', message='You have successfully listed a car!')
 
 def update_car_inventory(license_plate, car_make, car_model, body_type, engine_size, transmission_type, daily_rate):
@@ -620,6 +639,7 @@ def admin_dashboard():
                 SELECT cinv.license_plate, ci.car_make, ci.car_model, ci.body_type, ci.engine_size, ci.transmission_type, ci.daily_rate
                 FROM CarInformation ci
                 INNER JOIN CarInventory cinv ON ci.car_model = cinv.car_model
+                ORDER BY cinv.license_plate ASC
             """)
         data = cursor.fetchall()
         cursor.close()
