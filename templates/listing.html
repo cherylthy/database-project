@@ -59,7 +59,7 @@
       		<div class="col-md-12">
             <div class="car-details">
       				<div class="text text-center">
-                <p class="img rounded" style="background-image: url('{{ url_for('static', filename='assets/bg_1.jpg') }}');"></p>
+                <p class="img rounded" style="background-image: url('{{ url_for('static', filename='assets/' + image_path) }}');"></p>
               </div>
             </div>
           </div>
@@ -152,9 +152,13 @@
                   View other colours available:
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                  {% for color in colors %}
-                  <a class="dropdown-item" href="/listing/{{color[1]}}">{{color[0]}}</a>
-                  {% endfor %}
+                  {% if colors %}
+                    {% for color in colors %}
+                    <a class="dropdown-item" href="/listing/{{color[1]}}">{{color[0]}}</a>
+                    {% endfor %}
+                  {% else %}
+                  <a class="dropdown-item">No other colours available</a>
+                  {% endif %}
                 </div>
               </div>
           </div>
@@ -170,19 +174,21 @@
               <div class="review">
                 <div class="desc">
                   <h5 style="display: inline-block; width: 100%;">
-                    <span>{{ review["userID"] }}</span>
-                    <span style="float: right; font-size: 15px; color: rgba(0, 0, 0, 0.3); margin-top: 5px;">{{ review["timestamp"].strftime('%Y-%m-%d') }}</span>
+                    <span>{{ review["name"] }}</span>
+                    <span style="float: right; font-size: 15px; color: rgba(0, 0, 0, 0.3); margin-top: 5px;">{{ review["reviewDate"] }}</span>
                   </h5>
                   <p class="star" style="color: #1089ff;">
-                    {% for _ in range(review["ratings"]) %}
+                    {% for _ in range(review["rating"]) %}
                       <i class="ion-ios-star"></i>
                     {% endfor %}
-                    {% for _ in range(5 - review["ratings"]) %}
+                    {% for _ in range(5 - review["rating"]) %}
                       <i class="ion-ios-star-outline"></i>
                     {% endfor %}
                   </p>
                   <p>{{ review["comments"] }}</p>
-                  <br>
+                  {% if review["images"] %}
+                  <img src="{{ review["images"] }}" style="max-width: 100px; max-height: 100px; margin-left: 10px;">
+                  {% endif %}
                   <hr>
                   {% endfor %}
                 </div>
