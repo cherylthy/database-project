@@ -10,7 +10,9 @@ from flask import abort
 import logging
 from datetime import datetime, timedelta
 from flask_paginate import Pagination
-import datetime
+from datetime import datetime
+from firebase_admin import storage
+
 
 app = Flask(__name__)
 
@@ -37,6 +39,28 @@ def generate_document_id():
     # Generate a random unique identifier
     unique_id = str(uuid.uuid4())
     return f"reviews-{unique_id}"
+
+def generate_unique_filename(original_filename):
+    # Generate a unique identifier (UUID) and append it to the original filename
+    unique_id = str(uuid.uuid4())
+    _, file_extension = os.path.splitext(original_filename)
+    unique_filename = f"{unique_id}{file_extension}"
+    return unique_filename
+
+def upload_image_to_storage(image):
+    # Assuming you have initialized Firebase Admin SDK with credentials
+    bucket = storage.bucket()
+    
+    # Generate a unique filename or use other logic
+    filename = f"images/{generate_unique_filename(image.filename)}"
+    
+    blob = bucket.blob(filename)
+    blob.upload_from_string(image.read(), content_type=image.content_type)
+
+    # Get the public URL of the uploaded image
+    image_url = blob.public_url
+
+    return image_url
 
 @app.route('/')
 def select_all_from_table():
@@ -266,7 +290,7 @@ def delete_account():
     
     user_id = session['UserID']
     cursor = mysql.get_db().cursor()
-    cursor.execute("DELETE FROM UserAccounts WHERE UserID = %s", (user_id ))
+    cursor.callproc('DeleteUserAccount', (user_id,))
     mysql.get_db().commit()
     cursor.close()
 
@@ -462,34 +486,69 @@ def load_rental(rental_id):
         cursor.close()
         if data:
             user_id, license_plate, StartDate, EndDate, total_amount, timestamp, name, car_make, car_model, = data
-            
-            
-        # data = cursor.fetchone()
-        # cursor.close()
-        '''this is from mysql'''
-        # if data:
-            # user_id = data['UserID']    # from UserAccount
-            # user_name = data['Name']    # from UserAccount
-            # plate_id = data['license_plate']
-        # # Generate a document ID or use any logic suitable for your application
-        '''this is for firebase'''
-        document_id = generate_document_id()
-        # Set the review date to the current date and time
-        # review_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        # Add data to Firestore
-        firestore_data = {
-            # 'userID': user_id,
-            # 'plateID': plate_id,
-            # 'rating': star_ratings,
-            # 'comments': comments,
-            # 'name': user_name,
-            'rentalID': rental_id,
-            # 'reviewDate': review_date
-        }
-        crud.add('reviews', data=firestore_data, document_id=document_id)
+
+            # Store data in session
+            session['user_id'] = user_id
+            session['user_name'] = name
+            session['plate_id'] = license_plate
+            session['rental_id'] = rental_id
+
+
         return render_template('rental.html', start_date=StartDate, end_date=EndDate, rental_id=rental_id, car_type=car_make + car_model, license_plate=license_plate, total_amount=total_amount, timestamp=timestamp, message='You have successfully returned the car!')
     except Exception as e:
         return jsonify({'error': str(e)})
+
+@app.route('/upload', methods=['POST'])
+def upload_review():
+    try:
+        user_id = session.get('user_id')
+        user_name = session.get('user_name')
+        plate_id = session.get('plate_id')
+        rental_id = session.get('rental_id')
+
+        review_description = request.form.get('review_description')
+
+        # Generate a document ID or use any logic suitable for your application
+        '''this is for firebase'''
+        document_id = generate_document_id()
+        # Set the review date to the current date and time
+        current_date = datetime.now().date()
+        review_date = current_date.strftime('%Y-%m-%d')
+        # Access uploaded files
+        images = request.files.getlist('image[]')
+
+        # Process and save the images as needed
+        image_urls = []
+        for image in images:
+            # Save the image to the database or perform other operations
+            # Example: image.save('path/to/save/' + image.filename)
+
+            # Assume you are storing the image URL in Firestore
+            image_url = upload_image_to_storage(image)
+            image_urls.append(image_url)
+
+        # Add data to Firestore
+        firestore_data = {
+            'userID': user_id,
+            'plateID': plate_id,
+            'comments': review_description,
+            'name': user_name,
+            'rentalID': rental_id,
+            'reviewDate': review_date,
+            'images': image_urls  # Include the list of image URLs in Firestore data
+        }
+
+        crud.add('reviews', data=firestore_data, document_id=document_id)
+
+        # Continue with your existing code
+        return "Images uploaded successfully"
+    
+    except Exception as e:
+            return jsonify({'error': str(e)})
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
 
 @app.route('/create_listings', methods=['GET', 'POST'])
 def add_listing():
@@ -666,45 +725,6 @@ def admin_metrics():
     except Exception as e:
         return jsonify({'error': str(e)})
     
-
-@app.route('/all-reviews')
-def reviews():
-    try:
-        # Check if the user is logged in
-        if 'UserID' not in session:
-            return jsonify({'error': 'User not logged in'})
-
-        user_id = session['UserID']
-
-        result = crud.get("reviews")
-        # document_id = generate_document_id()
-        
-        # Add a document to a collection with a specific ID
-        # data = {"userID": 5432, "carID": 3333, "comments": "This car sucks", "ratings":4.5}
-        # crud.add('reviews', data=data, document_id=document_id)
-        
-        return render_template('all_reviews.html', reviews=result)
-
-        # cursor = mysql.get_db().cursor()
-        # cursor.execute("SELECT * FROM CarInventory")
-        # data = cursor.fetchall()
-        # cursor.close()
-        # return render_template('sql_test.html', data=data)
-
-        # cursor = mysql.get_db().cursor()
-        # # Fetch data only for the logged-in user
-        # cursor.execute("SELECT * FROM UserAccounts WHERE UserID = %s", (user_id,))
-        # data = cursor.fetchall()
-        # cursor.close()
-        
-        # Check if user exists
-        if not data:
-            return jsonify({'error': 'User not found'})
-
-        # return render_template('all_reviews.html', data=data)
-    
-    except Exception as e:
-        return jsonify({'error': str(e)})
     
 
 if __name__ == "__main__":
