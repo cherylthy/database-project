@@ -12,7 +12,7 @@ from flask_paginate import Pagination
 from datetime import datetime
 from firebase_admin import storage
 import os
-import firestore
+from google.cloud import firestore
 from google.cloud.firestore_v1 import SERVER_TIMESTAMP
 
 
@@ -369,21 +369,12 @@ def display_car_details(car_id):
         colors = cursor.fetchall()
         cursor.close()
         
-        # all_reviews = crud.get("reviews")
-        # reviews = [review for review in all_reviews if review.get("plateID") == car_id]
-        
         table = crud.db.collection("reviews")
-        print("t: ", table)
-        query = table.order_by("reviewDate")
-        print("q: ", query)
+        query = table.order_by("reviewDate", direction=firestore.Query.DESCENDING)
         results = query.get()
-        print("r: ", results)
-        for doc in results:
-            print("Document data:", doc.to_dict())
-        # all_reviews = crud.get("reviews").orderByChild("timestamp")
-        reviews = [review for review in results if review.get("plateID") == car_id]
-        for review in reviews:
-            print("review: ", review)
+        reviews = [review.to_dict() for review in results]
+        reviews = [review for review in reviews if review.get("plateID") == car_id]
+
         return render_template('listing.html', license_plate=license_plate, car_make=car_make, car_model=car_model, 
                                body_type=body_type, color=color, transmission_type=transmission_type, price=price, 
                                safety_features=safety_features, entertainment_features=entertainment_features, 
