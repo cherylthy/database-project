@@ -10,11 +10,11 @@ import logging
 from datetime import datetime, timedelta
 from flask_paginate import Pagination
 from datetime import datetime
-from firebase_admin import storage
+from firebase_admin import storage, credentials
 import os
 from google.cloud import firestore
 from google.cloud.firestore_v1 import SERVER_TIMESTAMP
-
+from google.oauth2 import service_account
 
 app = Flask(__name__)
 
@@ -66,19 +66,33 @@ def upload_image_to_storage(image):
 
 @app.route('/retrieve_image/<image_name>')
 def retrieve_image(image_name):
-    bucket = storage.bucket()
+    # bucket = storage.bucket()
 
-    # Specify the path to the image in the storage bucket
+    # # Specify the path to the image in the storage bucket
+    # image_path = f"review_images/{image_name}"
+
+    # # Create a blob object
+    # blob = bucket.blob(image_path)
+
+    # # Download the image to a temporary file
+    # temp_file_path = f"/static/assets/{image_name}"  # You may need to adjust the path based on your environment
+    # blob.download_to_filename(temp_file_path)
+
+    # # Send the image file in the response
+    # return send_file(temp_file_path, as_attachment=True)
+
+    credentials = service_account.Credentials.from_service_account_file("firebase-creds.json")
+    storage_client = storage.Client(credentials=credentials)
+    
+    bucket_name = '<inf2003-e21a8>.appspot.com'
     image_path = f"review_images/{image_name}"
-
-    # Create a blob object
+    
+    bucket = storage_client.bucket(bucket_name)
     blob = bucket.blob(image_path)
-
-    # Download the image to a temporary file
-    temp_file_path = f"/static/assets/{image_name}"  # You may need to adjust the path based on your environment
+    
+    temp_file_path = f"/static/assets/{image_name}"
     blob.download_to_filename(temp_file_path)
 
-    # Send the image file in the response
     return send_file(temp_file_path, as_attachment=True)
 
 @app.route('/')
@@ -790,9 +804,15 @@ def admin_metrics():
         cursor.execute("SELECT COUNT(license_plate) as car_count FROM CarInventory")
         car_count = cursor.fetchone()
         car_count = car_count[0]
+        
+        cursor.execute("SELECT * FROM CarInventory WHERE license_plate = (SELECT license_plate FROM Rentals GROUP BY license_plate ORDER BY COUNT(*) DESC LIMIT 1)")
+        # cursor.execute("SELECT i.license_plate, COUNT(rental_id) AS rental_count FROM CarInventory i INNER JOIN Rentals r ON i.license_plate = r.license_plate GROUP BY license_plate ORDER BY rental_count DESC LIMIT 1")
+        top_rented = cursor.fetchone()
+        top_car = top_rented[0]
+        
         cursor.close()
         
-        return render_template('admin_metrics.html', monthly_sales=monthly_sales, monthly_count=monthly_count, yearly_sales=yearly_sales, yearly_count=yearly_count, car_count=car_count)
+        return render_template('admin_metrics.html', monthly_sales=monthly_sales, monthly_count=monthly_count, yearly_sales=yearly_sales, yearly_count=yearly_count, car_count=car_count, top_car=top_car)
 
     except Exception as e:
         return jsonify({'error': str(e)})
