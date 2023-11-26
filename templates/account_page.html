@@ -153,6 +153,7 @@
                                 <div class="row">
                                     <div class="col-md-7">
                                         <h4 style="margin-bottom:30px;">Reviews</h4>
+                                        {% if reviews %}
                                         {% for review in reviews %}
                                         <div class="row" style="margin-left: 0px;">
                                             <div class="review d-flex">
@@ -164,13 +165,18 @@
                                                         <span class="text-right">{{ review['timestamp'] }}</span>
                                                     </h5>
                                                     <p class="star">
-                                                        <span>
+                                                        {% for _ in range(review["rating"]) %}
+                                                        <i class="ion-ios-star"></i>
+                                                        {% endfor %}
+                                                        {% for _ in range(5 - review["rating"]) %}
+                                                        <i class="ion-ios-star-outline"></i>
+                                                        {% endfor %}
+<!-- 
                                                             <i class="ion-ios-star"></i>
                                                             <i class="ion-ios-star"></i>
                                                             <i class="ion-ios-star"></i>
-                                                            <i class="ion-ios-star"></i>
-                                                            <i class="ion-ios-star"></i>
-                                                        </span>
+                                                            <i class="ion-ios-star"></i> -->
+                                                        
                                                         <span class="text-right"><a href="#" class="reply"><i
                                                                     class="icon-reply"></i></a></span>
                                                     </p>
@@ -183,12 +189,13 @@
                                             </div>
                                         </div>
                                         {% endfor %}
-                                        {% endfor %}
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
