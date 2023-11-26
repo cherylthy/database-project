@@ -795,11 +795,11 @@ def admin_metrics():
         cursor.execute("SELECT * FROM CarInventory WHERE license_plate = (SELECT license_plate FROM Rentals GROUP BY license_plate ORDER BY COUNT(*) DESC LIMIT 1)")
         # cursor.execute("SELECT i.license_plate, COUNT(rental_id) AS rental_count FROM CarInventory i INNER JOIN Rentals r ON i.license_plate = r.license_plate GROUP BY license_plate ORDER BY rental_count DESC LIMIT 1")
         top_rented = cursor.fetchone()
-        top_car = top_rented[0]
+        # top_car = top_rented[0]
         
         cursor.close()
         
-        return render_template('admin_metrics.html', monthly_sales=monthly_sales, monthly_count=monthly_count, yearly_sales=yearly_sales, yearly_count=yearly_count, car_count=car_count, top_car=top_car)
+        return render_template('admin_metrics.html', monthly_sales=monthly_sales, monthly_count=monthly_count, yearly_sales=yearly_sales, yearly_count=yearly_count, car_count=car_count, top_rented=top_rented)
 
     except Exception as e:
         return jsonify({'error': str(e)})
