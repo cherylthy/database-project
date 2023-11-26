@@ -538,25 +538,36 @@ def upload_review():
         # Process and save the images as needed
         image_urls = []
         for image in images:
-            # Save the image to the database or perform other operations
-            # Example: image.save('path/to/save/' + image.filename)
+            if allowed_file(image.filename):
+                # Save the image to the database or perform other operations
+                # Example: image.save('path/to/save/' + image.filename)
 
-            # Assume you are storing the image URL in Firestore
-            image_url = upload_image_to_storage(image)
-            image_urls.append(image_url)
+                # Assume you are storing the image URL in Firestore
+                image_url = upload_image_to_storage(image)
+                image_urls.append(image_url)
 
         # Add data to Firestore
-        firestore_data = {
-            'userID': user_id,
-            'plateID': plate_id,
-            'comments': review_description,
-            'name': user_name,
-            'rating': selected_rating, # temp hardcode
-            'rentalID': rental_id,
-            'reviewDate': SERVER_TIMESTAMP,
-            'images': image_urls  # Include the list of image URLs in Firestore data
-
-        }
+        if image_urls:
+            firestore_data = {
+                'userID': user_id,
+                'plateID': plate_id,
+                'comments': review_description,
+                'name': user_name,
+                'rating': selected_rating, # temp hardcode
+                'rentalID': rental_id,
+                'reviewDate': SERVER_TIMESTAMP,
+                'images': image_urls  # Include the list of image URLs in Firestore data
+            }
+        else:
+            firestore_data = {
+                'userID': user_id,
+                'plateID': plate_id,
+                'comments': review_description,
+                'name': user_name,
+                'rating': selected_rating, # temp hardcode
+                'rentalID': rental_id,
+                'reviewDate': SERVER_TIMESTAMP,
+            }
 
         crud.add('reviews', data=firestore_data, document_id=document_id)
 
@@ -566,6 +577,9 @@ def upload_review():
     except Exception as e:
             return jsonify({'error': str(e)})
 
+def allowed_file(filename):
+    allowed_extensions = {'jpg', 'jpeg', 'png', 'gif'}
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed_extensions
 
 @app.route('/create_listings', methods=['GET', 'POST'])
 def add_listing():
