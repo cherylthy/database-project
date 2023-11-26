@@ -12,7 +12,6 @@ from firebase_admin import storage
 import os
 from google.cloud import firestore
 from google.cloud.firestore_v1 import SERVER_TIMESTAMP
-from urllib.parse import quote
 
 
 app = Flask(__name__)
@@ -36,22 +35,20 @@ mysql.init_app(app)
 app.secret_key = 'secret'
 Debug(app)
 
+# Generate a random unique identifier
 def generate_document_id():
-    # Generate a random unique identifier
     unique_id = str(uuid.uuid4())
     return f"reviews-{unique_id}"
 
+# Generate a unique identifier (UUID) and append it to the original filename
 def generate_unique_filename(original_filename):
-    # Generate a unique identifier (UUID) and append it to the original filename
     unique_id = str(uuid.uuid4())
     _, file_extension = os.path.splitext(original_filename)
     unique_filename = f"{unique_id}{file_extension}"
     return unique_filename
 
 def upload_image_to_storage(image):
-    # Assuming you have initialized Firebase Admin SDK with credentials
     bucket = storage.bucket()
-    
     # Generate a unique filename or use other logic
     filename = f"review_images/{generate_unique_filename(image.filename)}"
     
@@ -78,7 +75,7 @@ def select_all_from_table():
         page = request.args.get('page', default=1, type=int)
 
         # Pagination settings
-        items_per_page = 15  # Adjust this based on your preference
+        items_per_page = 15
         offset = (page - 1) * items_per_page
 
         # Build the SQL query based on filtering and sorting parameters
@@ -193,11 +190,6 @@ def register():
         elif not name or not password or not email:
             msg = 'Please fill out the form!'
         else:
-            # Hash the password
-           #hash = password + app.secret_key
-           # hash = hashlib.sha1(hash.encode())
-           # password = hash.hexdigest()
-
             # Account doesn't exist, and the form data is valid, so insert the new account into the UserAccounts table
             cursor.callproc('AddUserAccount', (password, name, age, phoneno, email))
             mysql.get_db().commit()
@@ -250,7 +242,10 @@ def accounts():
         booking_data = cursor.fetchall()
         cursor.close()
         if booking_data:
-            session['RentalID'] = booking_data[0][0]  # Store the RentalID from the first row of the data
+
+            # Store the RentalID from the first row of the data
+            session['RentalID'] = booking_data[0][0] 
+
             # Check if user exists
         if not booking_data:
             # return jsonify({'error': 'User not found'})
@@ -273,7 +268,7 @@ def update_account():
             new_name = request.form.get('name')
             new_age = request.form.get('age')
             
-            # Input validation (add more checks based on your requirements)
+            # Input validation
             if not new_name or not new_age:
                 return jsonify({'error': 'Incomplete data provided'})
 
@@ -282,7 +277,7 @@ def update_account():
             mysql.get_db().commit()
             cursor.close()
                 
-            return redirect('/account')  # Redirect to account page after successful update
+            return redirect('/account')
             
     except Exception as e:
         return jsonify({'error': str(e)})
@@ -333,7 +328,6 @@ def display_car_details(car_id):
             column_names = [desc[0] for desc in cursor.description]
             row_dict = dict(zip(column_names, data))
 
-            # Now you can access the values using column names
             license_plate = row_dict['license_plate']
             car_make = row_dict['car_make']
             car_model = row_dict['car_model']
@@ -341,7 +335,6 @@ def display_car_details(car_id):
             engine_size = row_dict['engine_size']
             color = row_dict['color']
             transmission_type = row_dict['transmission_type']
-            # seats = row_dict['seats']
             price = row_dict['daily_rate']
             safety_features = row_dict['safety_features']
             entertainment_features = row_dict['entertainment_features']
@@ -466,7 +459,6 @@ def handle_booking():
             start_date = date_range[0]
             end_date = date_range[0]
 
-        print(user_id, plate_id, start_date, end_date, total_amount, timestamp)
         # Insert rental information and redirect to rental page
         rental_id = post_rental(user_id, plate_id, start_date, end_date, total_amount, timestamp)
         if rental_id is not None:
@@ -481,7 +473,6 @@ def handle_booking():
 def load_rental(rental_id):
     try:
         cursor = mysql.get_db().cursor()
-        # cursor.execute("SELECT CarInventory.car_make, CarInventory.car_model, CarInventory.license_plate, Rentals.StartDate, Rentals.EndDate, Rentals.TotalAmount, Rentals.Timestamp FROM CarInventory INNER JOIN Rentals ON CarInventory.license_plate = Rentals.PlateID WHERE RentalID = %s", (rental_id,))
         cursor.execute('''SELECT R.user_id, R.license_plate, R.start_date, R.end_date, R.total_amount, R.timestamp, A.name, F.car_make, F.car_model
                        FROM Rentals R
                        INNER JOIN UserAccounts A ON R.user_id = A.user_id
@@ -533,10 +524,6 @@ def upload_review():
         image_urls = []
         for image in images:
             if allowed_file(image.filename):
-                # Save the image to the database or perform other operations
-                # Example: image.save('path/to/save/' + image.filename)
-
-                # Assume you are storing the image URL in Firestore
                 image_url = upload_image_to_storage(image)
                 image_urls.append(image_url)
 
@@ -550,7 +537,7 @@ def upload_review():
                 'rating': selected_rating,
                 'rentalID': rental_id,
                 'reviewDate': SERVER_TIMESTAMP,
-                'images': image_urls  # Include the list of image URLs in Firestore data
+                'images': image_urls 
             }
         else:
             firestore_data = {
@@ -565,7 +552,6 @@ def upload_review():
 
         crud.add('reviews', data=firestore_data, document_id=document_id)
 
-        # Continue with your existing code
         return "Images uploaded successfully"
     
     except Exception as e:
@@ -598,7 +584,7 @@ def add_listing():
                 INSERT INTO CarInventory (license_plate, car_model, color)
                 VALUES (%s, %s, %s)
             """
-            car_inventory_data = (license_plate, car_model, color)  # Default color for simplicity
+            car_inventory_data = (license_plate, car_model, color) 
 
             cursor.execute(car_inventory_query, car_inventory_data)
             mysql.get_db().commit()
@@ -652,10 +638,9 @@ def update_car_inventory(license_plate, car_make, car_model, body_type, engine_s
         """
         cursor.execute(update_information_query, (car_make, car_model, body_type, engine_size, transmission_type, daily_rate, car_model))
 
-        
-        # Commit the changes to the database
         mysql.get_db().commit()
         cursor.close()
+
     except Exception as e:
         # Rollback the changes in case of an error
         mysql.get_db().rollback()
@@ -665,7 +650,7 @@ def update_car_inventory(license_plate, car_make, car_model, body_type, engine_s
 def admin_dashboard():
 
     page = request.args.get('page', 1, type=int)
-    per_page = 15  # the number of items per page
+    per_page = 15
 
     if request.method == 'GET':
         cursor = mysql.get_db().cursor()
@@ -729,7 +714,6 @@ def fetch_car_inventory():
     return render_template('admin_dashboard.html', data=paginated_data, pagination=pagination)
 
 def delete_car_inventory(selected_rows):
-    # Assuming 'license_plate' is the primary key column
     with mysql.get_db().cursor() as cursor:
         for license_plate in selected_rows:
             cursor.execute("DELETE FROM CarInventory WHERE license_plate = %s", (license_plate,))
@@ -756,7 +740,7 @@ def manage_users():
                 return jsonify({'error': str(e)})
     
     else:
-        abort(403)  # HTTP status code for forbidden access
+        abort(403) 
 
 def fetch_user_accounts():
     with mysql.get_db().cursor() as cursor:
@@ -792,9 +776,7 @@ def admin_metrics():
         car_count = car_count[0]
         
         cursor.execute("SELECT * FROM CarInventory WHERE license_plate = (SELECT license_plate FROM Rentals GROUP BY license_plate ORDER BY COUNT(*) DESC LIMIT 1)")
-        # cursor.execute("SELECT i.license_plate, COUNT(rental_id) AS rental_count FROM CarInventory i INNER JOIN Rentals r ON i.license_plate = r.license_plate GROUP BY license_plate ORDER BY rental_count DESC LIMIT 1")
         top_rented = cursor.fetchone()
-        # top_car = top_rented[0]
         
         cursor.close()
         
