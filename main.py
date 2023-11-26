@@ -12,6 +12,8 @@ from firebase_admin import storage
 import os
 from google.cloud import firestore
 from google.cloud.firestore_v1 import SERVER_TIMESTAMP
+from MySQL_cred import MYSQL_CONFIG
+
 
 
 app = Flask(__name__)
@@ -26,10 +28,10 @@ app.secret_key = 'your secret key'
 mysql = MySQL()
 
 # MySQL configuration
-app.config['MYSQL_DATABASE_HOST'] = '35.212.183.7'
-app.config['MYSQL_DATABASE_USER'] = 'common'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'dbpassword'
-app.config['MYSQL_DATABASE_DB'] = 'inf2003'
+app.config['MYSQL_DATABASE_HOST'] = MYSQL_CONFIG['host']
+app.config['MYSQL_DATABASE_USER'] = MYSQL_CONFIG['user']
+app.config['MYSQL_DATABASE_PASSWORD'] = MYSQL_CONFIG['password']
+app.config['MYSQL_DATABASE_DB'] = MYSQL_CONFIG['db']
 
 mysql.init_app(app)
 app.secret_key = 'secret'
