@@ -1,207 +1,227 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <title>Car Listing Page</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    
-    <link href="https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800&display=swap" rel="stylesheet">
 
-    <link rel= "stylesheet" type= "text/css" href= "https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800&display=swap">
-    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/open-iconic-bootstrap.min.css') }}">
-    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/bootstrap.min.css') }}">
-    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/animate.css') }}">
-    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/owl.carousel.min.css') }}">
-    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/owl.theme.default.min.css') }}">
-    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/magnific-popup.css') }}">
-    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/aos.css') }}">
-    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/ionicons.min.css') }}">
-    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/bootstrap-datepicker.css') }}">
-    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/jquery.timepicker.css') }}">
-    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/flaticon.css') }}">
-    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/icomoon.css') }}">
-    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
-    <style>
-      .book_float{
-        position: fixed;
-        bottom: 40px;
-        right: 40px;
-        background-color: #1089ff;
-        color: #FFF;
-        border-radius: 25px; /* Adjust the border-radius as needed */
-        padding: 10px; /* Add padding for better appearance */
-        text-align: center;
-        box-shadow: 2px 2px 3px #999;
-        text-decoration: none; /* Remove default underline */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 999;
-      }
+<head>
+  <title>Car Listing Page</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-      .book_float:hover {
-        // background-color: #1189ff; /* Change color on hover if desired */
-      }
-    </style>
-    {% include 'navbar.html' %}
-  </head>
-  <body>
-    <a href="/booking/{{ license_plate }}" class="book_float">
-      Book Now!
-    </a>
+  <link href="https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800&display=swap"
+    rel="stylesheet">
 
-		<section class="ftco-section ftco-car-details">
-      <div class="container">
-        <div class="row justify-content-center">
-      		<div class="col-md-12">
-            <div class="car-details">
-      				<div class="text text-center">
-                <p class="img rounded" style="background-image: url('{{ url_for('static', filename='assets/' + image_path) }}');"></p>
+  <link rel="stylesheet" type="text/css"
+    href="https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800&display=swap">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/open-iconic-bootstrap.min.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/bootstrap.min.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/animate.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/owl.carousel.min.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/owl.theme.default.min.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/magnific-popup.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/aos.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/ionicons.min.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/bootstrap-datepicker.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/jquery.timepicker.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/flaticon.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/icomoon.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/style.css') }}">
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+    crossorigin="anonymous"></script>
+  <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+  <style>
+    .book_float {
+      position: fixed;
+      bottom: 40px;
+      right: 40px;
+      background-color: #1089ff;
+      color: #FFF;
+      border-radius: 25px;
+      /* Adjust the border-radius as needed */
+      padding: 10px;
+      /* Add padding for better appearance */
+      text-align: center;
+      box-shadow: 2px 2px 3px #999;
+      text-decoration: none;
+      /* Remove default underline */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+
+    .book_float:hover {
+      // background-color: #1189ff; /* Change color on hover if desired */
+    }
+  </style>
+  {% include 'navbar.html' %}
+</head>
+
+<body>
+  <a href="/booking/{{ license_plate }}" class="book_float">
+    Book Now!
+  </a>
+
+  <section class="ftco-section ftco-car-details">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-12">
+          <div class="car-details">
+            <div class="text text-center">
+              <p class="img rounded"
+                style="background-image: url('{{ url_for('static', filename='assets/' + image_path) }}');"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row justify-content-center">
+        <div class="col-md-9">
+          <div class="car-details">
+            <div class="text text-center">
+              <span class="subheading" style="font-size: 20px;">{{ car_make }}</span>
+              <h2>{{ car_model }}</h2>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="car-price">
+            <div>
+              <p class="price ml-auto mt-3" style="color: #1089ff; font-weight: 600; font-size: 30px;">S${{price}}<span
+                  style="font-weight: 400; color: rgba(0, 0, 0, 0.3);">/day</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md d-flex align-self-stretch">
+          <div class="media block-6 services">
+            <div class="media-body py-md-4">
+              <div class="d-flex mb-3 align-items-center">
+                <div class="icon d-flex align-items-center justify-content-center"><span class="flaticon-rent"></span>
+                </div>
+                <div class="text">
+                  <h3 class="heading mb-0 pl-3">
+                    Body Type
+                    <span>{{ body_type }}</span>
+                  </h3>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      	<div class="row justify-content-center">
-      		<div class="col-md-9">
-      			<div class="car-details">
-      				<div class="text text-center">
-      					<span class="subheading" style="font-size: 20px;">{{ car_make }}</span>
-      					<h2>{{ car_model }}</h2>
-      				</div>
-      			</div>
-      		</div>
-          <div class="col-md-3">
-      			<div class="car-price">
-      				<div>
-      					<p class="price ml-auto mt-3" style="color: #1089ff; font-weight: 600; font-size: 30px;">S${{price}}<span style="font-weight: 400; color: rgba(0, 0, 0, 0.3);">/day</span></p>
-      				</div>
-      			</div>
-      		</div>
-      	</div>
-      	<div class="row">
-      		<div class="col-md d-flex align-self-stretch">
-            <div class="media block-6 services">
-              <div class="media-body py-md-4">
-              	<div class="d-flex mb-3 align-items-center">
-	              	<div class="icon d-flex align-items-center justify-content-center"><span class="flaticon-rent"></span></div>
-	              	<div class="text">
-		                <h3 class="heading mb-0 pl-3">
-		                	Body Type
-		                	<span>{{ body_type }}</span>
-		                </h3>
-	                </div>
+        <div class="col-md d-flex align-self-stretch">
+          <div class="media block-6 services">
+            <div class="media-body py-md-4">
+              <div class="d-flex mb-3 align-items-center">
+                <div class="icon d-flex align-items-center justify-content-center"><span
+                    class="flaticon-pistons"></span></div>
+                <div class="text">
+                  <h3 class="heading mb-0 pl-3">
+                    Transmission
+                    <span>{{ transmission_type }}</span>
+                  </h3>
                 </div>
               </div>
-            </div>      
+            </div>
           </div>
-          <div class="col-md d-flex align-self-stretch">
-            <div class="media block-6 services">
-              <div class="media-body py-md-4">
-              	<div class="d-flex mb-3 align-items-center">
-	              	<div class="icon d-flex align-items-center justify-content-center"><span class="flaticon-pistons"></span></div>
-	              	<div class="text">
-		                <h3 class="heading mb-0 pl-3">
-		                	Transmission
-		                	<span>{{ transmission_type }}</span>
-		                </h3>
-	                </div>
+        </div>
+        <div class="col-md d-flex align-self-stretch">
+          <div class="media block-6 services">
+            <div class="media-body py-md-4">
+              <div class="d-flex mb-3 align-items-center">
+                <div class="icon d-flex align-items-center justify-content-center"><span
+                    class="flaticon-car-seat"></span></div>
+                <div class="text">
+                  <h3 class="heading mb-0 pl-3">
+                    Seats
+                    <span>5 Adults</span>
+                  </h3>
                 </div>
               </div>
-            </div>      
+            </div>
           </div>
-          <div class="col-md d-flex align-self-stretch">
-            <div class="media block-6 services">
-              <div class="media-body py-md-4">
-              	<div class="d-flex mb-3 align-items-center">
-	              	<div class="icon d-flex align-items-center justify-content-center"><span class="flaticon-car-seat"></span></div>
-	              	<div class="text">
-		                <h3 class="heading mb-0 pl-3">
-		                	Seats
-		                	<span>5 Adults</span>
-		                </h3>
-	                </div>
-                </div>
-              </div>
-            </div>      
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <h4>Details</h4>
+          <p>Colour: {{color}}
+          <p>
+          <p>Engine Size (l): {{engine_size}}
+          <p>
+            <br>
+          <h5>Interior Features</h5>
+          <p>{{interior_features}}</p>
+          <br>
+          <h5>Exterior Features</h5>
+          <p>{{exterior_features}}</p>
+          <br>
+          <h5>Safety Features</h5>
+          <p>{{safety_features}}</p>
+          <br>
+          <h5>Entertainment Features</h5>
+          <p>{{entertainment_features}}</p>
+          <br>
+        </div>
+        <div class="col-md-6 align-items-center justify-content-center">
+          <div class="row justify-content-center dropdown">
+            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
+              aria-haspopup="true" aria-expanded="false">
+              View other colours available:
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              {% if colors %}
+              {% for color in colors %}
+              <a class="dropdown-item" href="/listing/{{color[1]}}">{{color[0]}}</a>
+              {% endfor %}
+              {% else %}
+              <a class="dropdown-item">No other colours available</a>
+              {% endif %}
+            </div>
           </div>
-      	</div>
-      	<div class="row">
-      		<div class="col-md-6">
-            <h4>Details</h4>
-            <p>Colour: {{color}}<p>
-            <p>Engine Size (l): {{engine_size}}<p>
-            <br>
-            <h5>Interior Features</h5>
-            <p>{{interior_features}}</p>
-            <br>
-            <h5>Exterior Features</h5>
-            <p>{{exterior_features}}</p>
-            <br>
-            <h5>Safety Features</h5>
-            <p>{{safety_features}}</p>
-            <br>
-            <h5>Entertainment Features</h5>
-            <p>{{entertainment_features}}</p>
-            <br>
-		      </div>
-          <div class="col-md-6 align-items-center justify-content-center">
-              <div class="row justify-content-center dropdown">
-                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  View other colours available:
-                </button>
-                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                  {% if colors %}
-                    {% for color in colors %}
-                    <a class="dropdown-item" href="/listing/{{color[1]}}">{{color[0]}}</a>
-                    {% endfor %}
-                  {% else %}
-                  <a class="dropdown-item">No other colours available</a>
-                  {% endif %}
-                </div>
-              </div>
-          </div>
-				</div>
-        <div id="pills-review">
+        </div>
+      </div>
+      <div id="pills-review">
         <div class="row">
           <div class="col-md-7">
             <br>
             <h4>Reviews</h4>
             {% if reviews %}
-              {% for review in reviews %}
-              <br>
-              <div class="review">
-                <div class="desc">
-                  <h5 style="display: inline-block; width: 100%;">
-                    <span>{{ review["name"] }}</span>
-                    <span style="float: right; font-size: 15px; color: rgba(0, 0, 0, 0.3); margin-top: 5px;">{{ review["reviewDate"].strftime("%Y-%m-%d %H:%M") }}</span>
-                  </h5>
-                  <p class="star" style="color: #1089ff;">
-                    {% for _ in range(review["rating"]) %}
-                      <i class="ion-ios-star"></i>
-                    {% endfor %}
-                    {% for _ in range(5 - review["rating"]) %}
-                      <i class="ion-ios-star-outline"></i>
-                    {% endfor %}
-                  </p>
-                  <p>{{ review["comments"] }}</p>
-                  {% if review["images"] %}
-                  <img src="{{ review["images"] }}" style="max-width: 100px; max-height: 100px; margin-left: 10px;">
-                  {% endif %}
-                  <hr>
-                </div>
+            {% for review in reviews %}
+            <br>
+            <div class="review">
+              <div class="desc">
+                <h5 style="display: inline-block; width: 100%;">
+                  <span>{{ review["name"] }}</span>
+                  <span style="float: right; font-size: 15px; color: rgba(0, 0, 0, 0.3); margin-top: 5px;">{{
+                    review["reviewDate"].strftime("%Y-%m-%d %H:%M") }}</span>
+                </h5>
+                <p class="star" style="color: #1089ff;">
+                  {% for _ in range(review["rating"]) %}
+                  <i class="ion-ios-star"></i>
+                  {% endfor %}
+                  {% for _ in range(5 - review["rating"]) %}
+                  <i class="ion-ios-star-outline"></i>
+                  {% endfor %}
+                </p>
+                <p>{{ review["comments"] }}</p>
+                {% for image_url in review['images'] %}
+                <img src={{ image_url }} alt="Review Image" width="50px;" height="50px;">
+                {% endfor %}
+                <hr>
               </div>
-              {% endfor %}
+            </div>
+            {% endfor %}
             {% else %}
             {% endif %}
             <p>No Reviews Yet</p>
           </div>
         </div>
       </div>
-      </div>
-    </section>
+    </div>
+  </section>
 </body>
 
 </html>
