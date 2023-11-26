@@ -87,9 +87,6 @@ def select_all_from_table():
         INNER JOIN CarImage i ON v.car_model = i.car_model)
         """
 
-        # Check if there's a make_filter parameter
-        if make_filter:
-            query += f" WHERE f.car_make = '{make_filter}'"
 
         query += f" ORDER BY {sort_by} {sort_order} LIMIT {offset}, {items_per_page}"
 
@@ -103,7 +100,7 @@ def select_all_from_table():
 
         # Check if there's a make_filter parameter
         if make_filter:
-            total_query += f" WHERE f.car_make = '{make_filter}'"
+            total_query += f" WHERE car_make = '{make_filter}'"
 
         cursor = mysql.get_db().cursor()
         cursor.execute(total_query)
