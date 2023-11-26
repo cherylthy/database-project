@@ -1,15 +1,13 @@
-from flask import Flask, render_template, jsonify, request, redirect, url_for, session, send_file
+from flask import Flask, render_template, jsonify, request, redirect, url_for, session, send_file, abort
 from firebase import Firebase
 from flaskext.mysql import MySQL
 import uuid
 import MySQLdb.cursors, re, hashlib
 from flask_debug import Debug
 from functools import wraps
-from flask import abort
 import logging
 from datetime import datetime, timedelta
 from flask_paginate import Pagination
-from datetime import datetime
 from firebase_admin import storage
 import os
 from google.cloud import firestore
@@ -341,7 +339,7 @@ def display_car_details(car_id):
             car_make = row_dict['car_make']
             car_model = row_dict['car_model']
             body_type = row_dict['body_type']
-            # year = row_dict['year']
+            engine_size = row_dict['engine_size']
             color = row_dict['color']
             transmission_type = row_dict['transmission_type']
             # seats = row_dict['seats']
@@ -367,7 +365,7 @@ def display_car_details(car_id):
                                body_type=body_type, color=color, transmission_type=transmission_type, price=price, 
                                safety_features=safety_features, entertainment_features=entertainment_features, 
                                interior_features=interior_features, exterior_features=exterior_features, 
-                               image_path=image_path, car_id=car_id, colors=colors, reviews=reviews)
+                               image_path=image_path, engine_size=engine_size, car_id=car_id, colors=colors, reviews=reviews)
 
     except Exception as e:
         return jsonify({'error': str(e)})
@@ -386,19 +384,19 @@ def booking_page(car_id):
             email = userdetails[5]
         
         cursor = mysql.get_db().cursor()
-        cursor.execute("SELECT * FROM CarInventory v INNER JOIN CarInformation f ON v.car_model = f.car_model WHERE license_plate = %s", (car_id,))
+        cursor.execute('''SELECT v.license_plate, f.car_make, v.car_model, f.daily_rate, i.image_path FROM ((CarInventory v INNER JOIN CarInformation f ON v.car_model = f.car_model) 
+                       INNER JOIN CarImage i ON v.car_model = i.car_model) WHERE license_plate = %s''', (car_id,))
         data = cursor.fetchone()
         cursor.close()
         if data:
             license_plate = data[0]
             car_make = data[1]
             car_model = data[2]
-            # year = data[3]
-            body_type = data[4]
-            price = data[16]
+            price = data[3]
+            image_path = data[4]
             
         cursor = mysql.get_db().cursor()
-        cursor.execute("SELECT * FROM Rentals WHERE plate_id = %s", (car_id,))
+        cursor.execute("SELECT * FROM Rentals WHERE license_plate = %s", (car_id,))
         rentals = cursor.fetchall()
         cursor.close()
         
@@ -413,7 +411,7 @@ def booking_page(car_id):
                 current_date += timedelta(days=1)
 
         return render_template('booking.html', license_plate=license_plate, car_make=car_make, car_model=car_model, 
-                               body_type=body_type, car_id=car_id, name=name, phone_no=phone_no, email=email, price=price, booked_dates=booked_dates)
+                               image_path=image_path, car_id=car_id, name=name, phone_no=phone_no, email=email, price=price, booked_dates=booked_dates)
 
     except Exception as e:
         return jsonify({'error': str(e)})
@@ -458,11 +456,7 @@ def handle_booking():
         plate_id = request.form['license_plate']
         date_range = request.form['booking_date']
         total_amount = request.form['final_amount']
-
-        current_utc_time = datetime.datetime.utcnow()
-        singapore_timezone_offset = datetime.timedelta(hours=8)
-        singapore_time = current_utc_time + singapore_timezone_offset
-        formatted_singapore_time = singapore_time.strftime('%Y-%m-%d %H:%M:%S')
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         date_range = date_range.split(" to ")
         if len(date_range) == 2:
@@ -473,8 +467,9 @@ def handle_booking():
             start_date = date_range[0]
             end_date = date_range[0]
 
+        print(user_id, plate_id, start_date, end_date, total_amount, timestamp)
         # Insert rental information and redirect to rental page
-        rental_id = post_rental(user_id, plate_id, start_date, end_date, total_amount, formatted_singapore_time)
+        rental_id = post_rental(user_id, plate_id, start_date, end_date, total_amount, timestamp)
         if rental_id is not None:
             return jsonify({'rental_id': rental_id})
         else:
@@ -553,7 +548,7 @@ def upload_review():
                 'plateID': plate_id,
                 'comments': review_description,
                 'name': user_name,
-                'rating': selected_rating, # temp hardcode
+                'rating': selected_rating,
                 'rentalID': rental_id,
                 'reviewDate': SERVER_TIMESTAMP,
                 'images': image_urls  # Include the list of image URLs in Firestore data
@@ -564,7 +559,7 @@ def upload_review():
                 'plateID': plate_id,
                 'comments': review_description,
                 'name': user_name,
-                'rating': selected_rating, # temp hardcode
+                'rating': selected_rating,
                 'rentalID': rental_id,
                 'reviewDate': SERVER_TIMESTAMP,
             }
@@ -766,16 +761,14 @@ def manage_users():
 
 def fetch_user_accounts():
     with mysql.get_db().cursor() as cursor:
-            cursor.execute("""
-                           SELECT 'UserId', `Name`, `Age`, `PhoneNo`, `Email` 
-                           FROM UserAccounts""")
+            cursor.execute("SELECT 'user_id', `name`, `age`, `phone_no`, `email` FROM UserAccounts")
             data = cursor.fetchall()
     return data
 
 def delete_selected_users(selected_users):
     with mysql.get_db().cursor() as cursor:
         for userid in selected_users:
-            cursor.execute("DELETE FROM UserAccounts WHERE UserID = %s", (userid,))
+            cursor.execute("DELETE FROM UserAccounts WHERE user_id = %s", (userid,))
     mysql.get_db().commit()
     
     
@@ -798,9 +791,15 @@ def admin_metrics():
         cursor.execute("SELECT COUNT(license_plate) as car_count FROM CarInventory")
         car_count = cursor.fetchone()
         car_count = car_count[0]
+        
+        cursor.execute("SELECT * FROM CarInventory WHERE license_plate = (SELECT license_plate FROM Rentals GROUP BY license_plate ORDER BY COUNT(*) DESC LIMIT 1)")
+        # cursor.execute("SELECT i.license_plate, COUNT(rental_id) AS rental_count FROM CarInventory i INNER JOIN Rentals r ON i.license_plate = r.license_plate GROUP BY license_plate ORDER BY rental_count DESC LIMIT 1")
+        top_rented = cursor.fetchone()
+        top_car = top_rented[0]
+        
         cursor.close()
         
-        return render_template('admin_metrics.html', monthly_sales=monthly_sales, monthly_count=monthly_count, yearly_sales=yearly_sales, yearly_count=yearly_count, car_count=car_count)
+        return render_template('admin_metrics.html', monthly_sales=monthly_sales, monthly_count=monthly_count, yearly_sales=yearly_sales, yearly_count=yearly_count, car_count=car_count, top_car=top_car)
 
     except Exception as e:
         return jsonify({'error': str(e)})
