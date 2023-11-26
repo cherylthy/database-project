@@ -271,15 +271,14 @@ def update_account():
             user_id = session['UserID']
             print(user_id)
             new_name = request.form.get('name')
-            new_email = request.form.get('email')
             new_age = request.form.get('age')
             
             # Input validation (add more checks based on your requirements)
-            if not new_name or not new_email or not new_age:
+            if not new_name or not new_age:
                 return jsonify({'error': 'Incomplete data provided'})
 
             cursor = mysql.get_db().cursor()
-            cursor.callproc('UpdateUserAccount', (user_id, new_name, new_email, new_age))
+            cursor.callproc('UpdateUserAccount', (user_id, new_name, new_age))
             mysql.get_db().commit()
             cursor.close()
                 
