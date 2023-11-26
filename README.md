@@ -25,14 +25,9 @@ This is an example of how to list things you need to use the software and how to
    ```
    
 2. Start to execute the code in the main.py folder after installing all required packages  
-   ```python 
-   # Run the code
-   create_table(conn_params)
-   insert_values(conn_params)
-   ```
    Open a terminal or command prompt, navigate to the directory containing the main.py file, and execute the file using the Python interpreter.
    ```shell
-   (venv) PS C:\Users\chery\Desktop\Database Sys\database-project> python main.py
+   (venv) PS ...\database-project> python main.py
    ```
     Should output as:
    ```shell
