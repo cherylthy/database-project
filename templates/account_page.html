@@ -176,43 +176,14 @@
                                                     </p>
                                                     <p>{{ review['comments'] }} </p>
                                                     {% for image_url in review['images'] %}
-                                                    <img src="{{ url_for('retrieve_image', image_name=image_url) }}"
-                                                        alt="Review Image">
+                                                    <img src= {{ image_url }}
+                                                        alt="Review Image" width="50px;" height="50px;">
                                                     {% endfor %}
                                                 </div>
                                             </div>
                                         </div>
                                         {% endfor %}
                                         {% endfor %}
-                                        <h4>Reviews</h4>
-                                        {% if reviews %}
-                                            {% for review in reviews %}
-                                            <br>
-                                            <div class="review">
-                                                <div class="desc">
-                                                <h5 style="display: inline-block; width: 100%;">
-                                                    <span>{{ review["name"] }}</span>
-                                                    <span style="float: right; font-size: 15px; color: rgba(0, 0, 0, 0.3); margin-top: 5px;">{{ review["reviewDate"].strftime("%Y-%m-%d %H:%M") }}</span>
-                                                </h5>
-                                                <p class="star" style="color: #1089ff;">
-                                                    {% for _ in range(review["rating"]) %}
-                                                    <i class="ion-ios-star"></i>
-                                                    {% endfor %}
-                                                    {% for _ in range(5 - review["rating"]) %}
-                                                    <i class="ion-ios-star-outline"></i>
-                                                    {% endfor %}
-                                                </p>
-                                                <p>{{ review["comments"] }}</p>
-                                                {% if review["images"] %}
-                                                <img src="{{ review["images"] }}" style="max-width: 100px; max-height: 100px; margin-left: 10px;">
-                                                {% endif %}
-                                                <hr>
-                                                </div>
-                                            </div>
-                                            {% endfor %}
-                                        {% else %}
-                                        {% endif %}
-                                        <p>No Reviews Yet</p>
                                     </div>
                                 </div>
                             </div>

@@ -10,11 +10,12 @@ import logging
 from datetime import datetime, timedelta
 from flask_paginate import Pagination
 from datetime import datetime
-from firebase_admin import storage, credentials
+from firebase_admin import storage
 import os
 from google.cloud import firestore
 from google.cloud.firestore_v1 import SERVER_TIMESTAMP
-from google.oauth2 import service_account
+from urllib.parse import quote
+
 
 app = Flask(__name__)
 
@@ -58,42 +59,11 @@ def upload_image_to_storage(image):
     
     blob = bucket.blob(filename)
     blob.upload_from_string(image.read(), content_type=image.content_type)
+    blob.make_public()
 
     # Get the public URL of the uploaded image
     image_url = blob.public_url
-
     return image_url
-
-@app.route('/retrieve_image/<image_name>')
-def retrieve_image(image_name):
-    # bucket = storage.bucket()
-
-    # # Specify the path to the image in the storage bucket
-    # image_path = f"review_images/{image_name}"
-
-    # # Create a blob object
-    # blob = bucket.blob(image_path)
-
-    # # Download the image to a temporary file
-    # temp_file_path = f"/static/assets/{image_name}"  # You may need to adjust the path based on your environment
-    # blob.download_to_filename(temp_file_path)
-
-    # # Send the image file in the response
-    # return send_file(temp_file_path, as_attachment=True)
-
-    credentials = service_account.Credentials.from_service_account_file("firebase-creds.json")
-    storage_client = storage.Client(credentials=credentials)
-    
-    bucket_name = '<inf2003-e21a8>.appspot.com'
-    image_path = f"review_images/{image_name}"
-    
-    bucket = storage_client.bucket(bucket_name)
-    blob = bucket.blob(image_path)
-    
-    temp_file_path = f"/static/assets/{image_name}"
-    blob.download_to_filename(temp_file_path)
-
-    return send_file(temp_file_path, as_attachment=True)
 
 @app.route('/')
 def select_all_from_table():
@@ -105,7 +75,7 @@ def select_all_from_table():
         
         # Get filtering and sorting parameters from the request
         make_filter = request.args.get('make', default=None, type=str)
-        sort_by = request.args.get('sort_by', default='f.car_make', type=str)
+        sort_by = request.args.get('sort_by', default='car_make', type=str)
         sort_order = request.args.get('sort_order', default='asc', type=str)
         page = request.args.get('page', default=1, type=int)
 
@@ -114,11 +84,15 @@ def select_all_from_table():
         offset = (page - 1) * items_per_page
 
         # Build the SQL query based on filtering and sorting parameters
-        query = "SELECT v.license_plate, f.car_make, v.car_model, f.daily_rate, i.image_path FROM ((CarInventory v INNER JOIN CarInformation f ON v.car_model = f.car_model) INNER JOIN CarImage i ON v.car_model = i.car_model)"
+        query = """
+        SELECT v.license_plate, f.car_make, v.car_model, f.daily_rate, i.image_path 
+        FROM ((CarInventory v INNER JOIN CarInformation f ON v.car_model = f.car_model) 
+        INNER JOIN CarImage i ON v.car_model = i.car_model)
+        """
 
         # Check if there's a make_filter parameter
         if make_filter:
-            query += f" WHERE car_make = '{make_filter}'"
+            query += f" WHERE f.car_make = '{make_filter}'"
 
         query += f" ORDER BY {sort_by} {sort_order} LIMIT {offset}, {items_per_page}"
 
@@ -128,7 +102,11 @@ def select_all_from_table():
         cursor.close()
 
         # Get total count for pagination
-        total_query = "SELECT COUNT(*) FROM CarInformation"
+        total_query = "SELECT COUNT(*) FROM CarInventory"
+
+        # Check if there's a make_filter parameter
+        if make_filter:
+            total_query += f" WHERE f.car_make = '{make_filter}'"
 
         cursor = mysql.get_db().cursor()
         cursor.execute(total_query)
@@ -363,7 +341,7 @@ def display_car_details(car_id):
             car_make = row_dict['car_make']
             car_model = row_dict['car_model']
             body_type = row_dict['body_type']
-            engine_size = row_dict['engine_size']
+            # year = row_dict['year']
             color = row_dict['color']
             transmission_type = row_dict['transmission_type']
             # seats = row_dict['seats']
@@ -389,7 +367,7 @@ def display_car_details(car_id):
                                body_type=body_type, color=color, transmission_type=transmission_type, price=price, 
                                safety_features=safety_features, entertainment_features=entertainment_features, 
                                interior_features=interior_features, exterior_features=exterior_features, 
-                               image_path=image_path, engine_size=engine_size, car_id=car_id, colors=colors, reviews=reviews)
+                               image_path=image_path, car_id=car_id, colors=colors, reviews=reviews)
 
     except Exception as e:
         return jsonify({'error': str(e)})
@@ -408,19 +386,19 @@ def booking_page(car_id):
             email = userdetails[5]
         
         cursor = mysql.get_db().cursor()
-        cursor.execute('''SELECT v.license_plate, f.car_make, v.car_model, f.daily_rate, i.image_path FROM ((CarInventory v INNER JOIN CarInformation f ON v.car_model = f.car_model) 
-                       INNER JOIN CarImage i ON v.car_model = i.car_model) WHERE license_plate = %s''', (car_id,))
+        cursor.execute("SELECT * FROM CarInventory v INNER JOIN CarInformation f ON v.car_model = f.car_model WHERE license_plate = %s", (car_id,))
         data = cursor.fetchone()
         cursor.close()
         if data:
             license_plate = data[0]
             car_make = data[1]
             car_model = data[2]
-            price = data[3]
-            image_path = data[4]
+            # year = data[3]
+            body_type = data[4]
+            price = data[16]
             
         cursor = mysql.get_db().cursor()
-        cursor.execute("SELECT * FROM Rentals WHERE license_plate = %s", (car_id,))
+        cursor.execute("SELECT * FROM Rentals WHERE plate_id = %s", (car_id,))
         rentals = cursor.fetchall()
         cursor.close()
         
@@ -435,7 +413,7 @@ def booking_page(car_id):
                 current_date += timedelta(days=1)
 
         return render_template('booking.html', license_plate=license_plate, car_make=car_make, car_model=car_model, 
-                               image_path=image_path, car_id=car_id, name=name, phone_no=phone_no, email=email, price=price, booked_dates=booked_dates)
+                               body_type=body_type, car_id=car_id, name=name, phone_no=phone_no, email=email, price=price, booked_dates=booked_dates)
 
     except Exception as e:
         return jsonify({'error': str(e)})
@@ -573,7 +551,7 @@ def upload_review():
             'plateID': plate_id,
             'comments': review_description,
             'name': user_name,
-            'rating': selected_rating,
+            'rating': selected_rating, # temp hardcode
             'rentalID': rental_id,
             'reviewDate': SERVER_TIMESTAMP,
             'images': image_urls  # Include the list of image URLs in Firestore data
@@ -774,14 +752,16 @@ def manage_users():
 
 def fetch_user_accounts():
     with mysql.get_db().cursor() as cursor:
-            cursor.execute("SELECT 'user_id', `name`, `age`, `phone_no`, `email` FROM UserAccounts")
+            cursor.execute("""
+                           SELECT 'UserId', `Name`, `Age`, `PhoneNo`, `Email` 
+                           FROM UserAccounts""")
             data = cursor.fetchall()
     return data
 
 def delete_selected_users(selected_users):
     with mysql.get_db().cursor() as cursor:
         for userid in selected_users:
-            cursor.execute("DELETE FROM UserAccounts WHERE user_id = %s", (userid,))
+            cursor.execute("DELETE FROM UserAccounts WHERE UserID = %s", (userid,))
     mysql.get_db().commit()
     
     
@@ -804,15 +784,9 @@ def admin_metrics():
         cursor.execute("SELECT COUNT(license_plate) as car_count FROM CarInventory")
         car_count = cursor.fetchone()
         car_count = car_count[0]
-        
-        cursor.execute("SELECT * FROM CarInventory WHERE license_plate = (SELECT license_plate FROM Rentals GROUP BY license_plate ORDER BY COUNT(*) DESC LIMIT 1)")
-        # cursor.execute("SELECT i.license_plate, COUNT(rental_id) AS rental_count FROM CarInventory i INNER JOIN Rentals r ON i.license_plate = r.license_plate GROUP BY license_plate ORDER BY rental_count DESC LIMIT 1")
-        top_rented = cursor.fetchone()
-        top_car = top_rented[0]
-        
         cursor.close()
         
-        return render_template('admin_metrics.html', monthly_sales=monthly_sales, monthly_count=monthly_count, yearly_sales=yearly_sales, yearly_count=yearly_count, car_count=car_count, top_car=top_car)
+        return render_template('admin_metrics.html', monthly_sales=monthly_sales, monthly_count=monthly_count, yearly_sales=yearly_sales, yearly_count=yearly_count, car_count=car_count)
 
     except Exception as e:
         return jsonify({'error': str(e)})
