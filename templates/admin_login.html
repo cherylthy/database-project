@@ -1,32 +1,35 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>Admin Login</title>
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/login.css') }}">
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
-    </head>
-    <body>
-        <div class="admin_login">
-            <a href="/" class="homepage-button">Home</a>
-            <h1>Admin</h1>
-            <div class="links">
-                <a href="{{ url_for('login') }}">Login</a>
-                <a href="{{ url_for('register') }}">Register</a>
-                <a href="{{ url_for('admin_login') }}" class="active">Admin</a>
-            </div>
-            <form action="{{ url_for('admin_login') }}" method="post">
-                <label for="Email">
-                    <i class="fas fa-user"></i>
-                </label>
-                <input type="text" name="Email" placeholder="Email" id="Email" required>
-                <label for="Password">
-                    <i class="fas fa-lock"></i>
-                </label>
-                <input type="password" name="Password" placeholder="Password" id="Password" required>
-                <div class="msg">{{ msg }}</div>
-                <input type="submit" value="Login">
-            </form>
+
+<head>
+    <meta charset="utf-8">
+    <title>Admin Login</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/login.css') }}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+</head>
+
+<body>
+    <div class="admin_login">
+        <a href="/" class="homepage-button">Home</a>
+        <h1>Admin</h1>
+        <div class="links">
+            <a href="{{ url_for('login') }}">Login</a>
+            <a href="{{ url_for('register') }}">Register</a>
+            <a href="{{ url_for('admin_login') }}" class="active">Admin</a>
         </div>
-    </body>
+        <form action="{{ url_for('admin_login') }}" method="post">
+            <label for="Email">
+                <i class="fas fa-user"></i>
+            </label>
+            <input type="text" name="Email" placeholder="Email" id="Email" required>
+            <label for="Password">
+                <i class="fas fa-lock"></i>
+            </label>
+            <input type="password" name="Password" placeholder="Password" id="Password" required>
+            <div class="msg">{{ msg }}</div>
+            <input type="submit" value="Login">
+        </form>
+    </div>
+</body>
+
 </html>

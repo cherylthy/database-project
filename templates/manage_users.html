@@ -1,39 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Manage Users</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/admin_dashboard.css') }}">
 </head>
+
 <body>
 
-<div class="navbar">
-    <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
-    <a href="{{ url_for('manage_users') }}" class="active">Users</a>
-    <a href="{{ url_for('add_listing')}}">Create Listings</a>
-    <a href="{{ url_for('admin_metrics') }}">Metrics</a>
-    <a href="{{ url_for('logout') }}">Logout</a>
-</div>
+    <div class="navbar">
+        <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('manage_users') }}" class="active">Users</a>
+        <a href="{{ url_for('add_listing')}}">Create Listings</a>
+        <a href="{{ url_for('admin_metrics') }}">Metrics</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
 
-<div class="content">
-    <h1>User Management</h1>
-    <div class="table-container">
-        <form id="delete-user-form">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Select</th>
-                        <th>User ID</th>
-                        <th>Name</th>
-                        <th>Age</th>
-                        <th>Phone Number</th>
-                        <th>Email</th>
-                        
-                        <!-- Add more columns based on your UserAccounts table structure -->
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for user in data %}
+    <div class="content">
+        <h1>User Management</h1>
+        <div class="table-container">
+            <form id="delete-user-form">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Select</th>
+                            <th>User ID</th>
+                            <th>Name</th>
+                            <th>Age</th>
+                            <th>Phone Number</th>
+                            <th>Email</th>
+
+                            <!-- Add more columns based on your UserAccounts table structure -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in data %}
                         <tr>
                             <td><input type="checkbox" name="select_user" value="{{ user[0] }}"></td>
                             <td>{{ user[0] }}</td>
@@ -44,13 +46,14 @@
                             <td>{{ user[5] }}</td>
                             <!-- Add more columns based on your UserAccounts table structure -->
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            <button id="delete-selected-users">Delete Selected Users</button>
-        </form>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <button id="delete-selected-users">Delete Selected Users</button>
+            </form>
+        </div>
     </div>
-</div>
-<script src="static/js/register.js"></script>
+    <script src="static/js/register.js"></script>
 </body>
+
 </html>

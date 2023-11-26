@@ -1,77 +1,81 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<title>Register</title>
-		<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/login.css') }}">
-		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
-	</head>
-	<body>
-		<div class="register">
-			<h1>Register</h1>
-			<div class="links">
-				<a href="{{ url_for('login') }}">Login</a>
-				<a href="{{ url_for('register') }}" class="active">Register</a>
-				<a href="{{ url_for('admin_login') }}">Admin</a>
-			</div>
-			<form action="{{ url_for('register') }}" method="post" autocomplete="off">
-				<label for="username">
-					<i class="fas fa-user"></i>
-				</label>
 
-				<input type="text" name="Name" placeholder="Name" id="Name" required>
-				<label for="password">
-					<i class="fas fa-lock"></i>
-				</label>
-				<input type="password" name="Password" placeholder="Password" id="Password" required>
-				
-				<label for="email">
-					<i class="fas fa-envelope"></i>
-				</label>
-				<input type="email" name="Email" placeholder="Email" id="Email" required>
-				
-				<label for="Age">
-					<i class="fas fa-birthday-cake"></i>
-				</label>
-				<input type="number" name="Age" placeholder="Age" id="Age" required min="18">
+<head>
+	<meta charset="utf-8">
+	<title>Register</title>
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/login.css') }}">
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+</head>
 
-				<label for="PhoneNo">
-					<i class="fas fa-phone"></i>
-				</label>
-				<input type="tel" name="PhoneNo" placeholder="Phone Number" id="PhoneNo" required pattern="[89][0-9]{7}" title="Please enter a valid 8-digit phone number starting with 8 or 9">
-				<div id="phoneNoError" style="color: red;"></div>
-				
-				<script>
-				  // JavaScript for additional phone number validation
-				  const phoneNoInput = document.getElementById("PhoneNo");
-				  const phoneNoError = document.getElementById("phoneNoError");
-				
-				  phoneNoInput.addEventListener("input", function () {
+<body>
+	<div class="register">
+		<h1>Register</h1>
+		<div class="links">
+			<a href="{{ url_for('login') }}">Login</a>
+			<a href="{{ url_for('register') }}" class="active">Register</a>
+			<a href="{{ url_for('admin_login') }}">Admin</a>
+		</div>
+		<form action="{{ url_for('register') }}" method="post" autocomplete="off">
+			<label for="username">
+				<i class="fas fa-user"></i>
+			</label>
+
+			<input type="text" name="Name" placeholder="Name" id="Name" required>
+			<label for="password">
+				<i class="fas fa-lock"></i>
+			</label>
+			<input type="password" name="Password" placeholder="Password" id="Password" required>
+
+			<label for="email">
+				<i class="fas fa-envelope"></i>
+			</label>
+			<input type="email" name="Email" placeholder="Email" id="Email" required>
+
+			<label for="Age">
+				<i class="fas fa-birthday-cake"></i>
+			</label>
+			<input type="number" name="Age" placeholder="Age" id="Age" required min="18">
+
+			<label for="PhoneNo">
+				<i class="fas fa-phone"></i>
+			</label>
+			<input type="tel" name="PhoneNo" placeholder="Phone Number" id="PhoneNo" required pattern="[89][0-9]{7}"
+				title="Please enter a valid 8-digit phone number starting with 8 or 9">
+			<div id="phoneNoError" style="color: red;"></div>
+
+			<script>
+				// JavaScript for additional phone number validation
+				const phoneNoInput = document.getElementById("PhoneNo");
+				const phoneNoError = document.getElementById("phoneNoError");
+
+				phoneNoInput.addEventListener("input", function () {
 					if (!phoneNoInput.checkValidity()) {
-					  phoneNoError.textContent = "Please enter a valid 8-digit phone number starting with 8 or 9.";
+						phoneNoError.textContent = "Please enter a valid 8-digit phone number starting with 8 or 9.";
 					} else {
-					  phoneNoError.textContent = "";
+						phoneNoError.textContent = "";
 					}
-				  });
-				</script>
+				});
+			</script>
 
-				<!-- Add checkbox for accepting terms and conditions -->
-				<label for="acceptTerms">
-					<input type="checkbox" name="acceptTerms" id="acceptTerms" required>
-					I accept the <a href="#" id="openTermsModal">Terms and Conditions</a>
-				</label>
-				
-				<!-- The modal for Terms and Conditions -->
-				<div id="termsModal" class="modal">
-					<div class="modal-content">
+			<!-- Add checkbox for accepting terms and conditions -->
+			<label for="acceptTerms">
+				<input type="checkbox" name="acceptTerms" id="acceptTerms" required>
+				I accept the <a href="#" id="openTermsModal">Terms and Conditions</a>
+			</label>
+
+			<!-- The modal for Terms and Conditions -->
+			<div id="termsModal" class="modal">
+				<div class="modal-content">
 					<!-- Content for the Terms and Conditions goes here -->
 					<p>These are the terms and conditions...</p>
-					</div>
-				</div>	  
-				<div class="msg">{{ msg }}</div>
-				<input type="submit" value="Register">
-			</form>
-		</div>
-		<script src="static/js/register.js"></script>
-	</body>
+				</div>
+			</div>
+			<div class="msg">{{ msg }}</div>
+			<input type="submit" value="Register">
+		</form>
+	</div>
+	<script src="static/js/register.js"></script>
+</body>
+
 </html>

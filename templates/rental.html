@@ -29,75 +29,77 @@
   <section class="ftco-section contact-section">
     <div class="container">
       <div class="row d-flex mb-5 contact-info">
-          <div class="row mb-5">
-            <div class="col-md-12">
-              <div class="bg-light p-5 w-100">
-                <h3 class="heading-section mb-4">Current Rental</h3>
-                <div class="row d-flex mb-4">
-                  <div class="item">
-                    <div class="testimony-wrap rounded text-center py-4 pb-5">
-                      <div class="text pt-4" style="text-align: left" ;>
-                        <div>
-                          <p class="name">Rental ID: {{ rental_id }}</p>
-                          <div class="date-info">
-                            <p class="name">Car Booked: {{ car_type }}</p>
-                            <p class="name">License Plate: {{ license_plate }}</p>
-                            <p class="name">Start Date: {{ start_date }}</p>
-                            <p class="name">End Date: {{ end_date }}</p>
-                          </div>
+        <div class="row mb-5">
+          <div class="col-md-12">
+            <div class="bg-light p-5 w-100">
+              <h3 class="heading-section mb-4">Current Rental</h3>
+              <div class="row d-flex mb-4">
+                <div class="item">
+                  <div class="testimony-wrap rounded text-center py-4 pb-5">
+                    <div class="text pt-4" style="text-align: left" ;>
+                      <div>
+                        <p class="name">Rental ID: {{ rental_id }}</p>
+                        <div class="date-info">
+                          <p class="name">Car Booked: {{ car_type }}</p>
+                          <p class="name">License Plate: {{ license_plate }}</p>
+                          <p class="name">Start Date: {{ start_date }}</p>
+                          <p class="name">End Date: {{ end_date }}</p>
                         </div>
                       </div>
                     </div>
                   </div>
-                  <div class="d-flex">
-                    <p><a href="#" class="btn btn-primary py-3 px-4" onclick="toggleForm()">Return Car Now</a></p>
-                    <form id="cancelBookingForm" action="/cancel-booking" method="post">
-                      <input type="hidden" name="rental_id" value="{{ rental_id }}">
-                      <p><button type="button" class="btn btn-primary py-3 px-4" style="margin-left:10px;" onclick="cancelBooking()">Cancel Booking</button></p>
-                    </form>
-                     </div>
+                </div>
+                <div class="d-flex">
+                  <p><a href="#" class="btn btn-primary py-3 px-4" onclick="toggleForm()">Return Car Now</a></p>
+                  <form id="cancelBookingForm" action="/cancel-booking" method="post">
+                    <input type="hidden" name="rental_id" value="{{ rental_id }}">
+                    <p><button type="button" class="btn btn-primary py-3 px-4" style="margin-left:10px;"
+                        onclick="cancelBooking()">Cancel Booking</button></p>
+                  </form>
                 </div>
               </div>
             </div>
           </div>
-          <div class="col-md-8 block-9 mb-md-5">
-            <form action="/upload" method="post" class="bg-light p-5 contact-form" enctype="multipart/form-data">
-              <p style="text-align: center;"> Car Officially Returned!</p>
-              <p style="text-align: center; margin-bottom:10px;"> Leave us a review!</p>
-              <!-- houwei do the star ratings here -->
-              <div class="row" style="padding-left: 10px">
-                <div class="stars" id="star_rating">
-                  <input type="radio" id="five" name="rate" value="5">
-                  <label for="five"></label>
-                  <input type="radio" id="four" name="rate" value="4">
-                  <label for="four"></label>
-                  <input type="radio" id="three" name="rate" value="3">
-                  <label for="three"></label>
-                  <input type="radio" id="two" name="rate" value="2">
-                  <label for="two"></label>
-                  <input type="radio" id="one" name="rate" value="1">
-                  <label for="one"></label>
-                  <span class="result"></span>
-                </div>
+        </div>
+        <div class="col-md-8 block-9 mb-md-5">
+          <form action="/upload" method="post" class="bg-light p-5 contact-form" enctype="multipart/form-data">
+            <p style="text-align: center;"> Car Officially Returned!</p>
+            <p style="text-align: center; margin-bottom:10px;"> Leave us a review!</p>
+            <!-- houwei do the star ratings here -->
+            <div class="row" style="padding-left: 10px">
+              <div class="stars" id="star_rating">
+                <input type="radio" id="five" name="rate" value="5">
+                <label for="five"></label>
+                <input type="radio" id="four" name="rate" value="4">
+                <label for="four"></label>
+                <input type="radio" id="three" name="rate" value="3">
+                <label for="three"></label>
+                <input type="radio" id="two" name="rate" value="2">
+                <label for="two"></label>
+                <input type="radio" id="one" name="rate" value="1">
+                <label for="one"></label>
+                <span class="result"></span>
               </div>
-              <div class="form-group">
-                <input type="hidden" name="star_ratings" id="selected_rating", value="">
-              </div>
-              <div class="form-group">
-                <textarea name="review_description" id="" cols="30" rows="7" class="form-control"
-                  placeholder="Message"></textarea>
-              </div>
-              <div class="form-group">
-                <label for="image">Upload Images:</label>
-                <input type="file" name="image[]" id="image" multiple accept="image/*">
-                <small class="form-text text-muted">Select one or multiple images. Accepted formats: JPG, JPEG, PNG, GIF.</small>
-              </div>
-              <div class="form-group">
-                <input type="submit" value="Send Message" class="btn btn-primary py-3 px-5">
-              </div>
-            </form>
+            </div>
+            <div class="form-group">
+              <input type="hidden" name="star_ratings" id="selected_rating" , value="">
+            </div>
+            <div class="form-group">
+              <textarea name="review_description" id="" cols="30" rows="7" class="form-control"
+                placeholder="Message"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="image">Upload Images:</label>
+              <input type="file" name="image[]" id="image" multiple accept="image/*">
+              <small class="form-text text-muted">Select one or multiple images. Accepted formats: JPG, JPEG, PNG,
+                GIF.</small>
+            </div>
+            <div class="form-group">
+              <input type="submit" value="Send Message" class="btn btn-primary py-3 px-5">
+            </div>
+          </form>
 
-          </div>
+        </div>
         <div class="row justify-content-center">
           <div class="col-md-12">
             <div id="map" class="bg-white"></div>
@@ -146,11 +148,11 @@
     // Add click event listeners to each star
     const stars = document.querySelectorAll('input[type="radio"]');
     stars.forEach(star => {
-        star.addEventListener('click', function () {
-            const selected_rating = this.value;
-            // Update the hidden input value with the selected rating
-            // document.querySelector('.result').textContent = `Selected Rating: ${selected_rating}`;
-        });
+      star.addEventListener('click', function () {
+        const selected_rating = this.value;
+        // Update the hidden input value with the selected rating
+        // document.querySelector('.result').textContent = `Selected Rating: ${selected_rating}`;
+      });
     });
   </script>
 

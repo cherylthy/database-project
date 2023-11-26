@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/admin_dashboard.css') }}">
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 </head>
+
 <body>
     <div class="navbar">
         <a href="{{ url_for('admin_dashboard') }}" class="active">Dashboard</a>
@@ -37,18 +39,20 @@
                     </thead>
                     <tbody>
                         {% for row in data %}
-                            <tr>
-                                <td><input type="checkbox" name="select_row" value="{{ row[0] }}"></td>
-                                <td>{{ row[0] }}</td>
-                                <td>{{ row[1] }}</td>
-                                <td>{{ row[2] }}</td>
-                                <td>{{ row[3] }}</td>
-                                <td>{{ row[4] }}</td>
-                                <td>{{ row[5] }}</td>
-                                <td>{{ row[6] }}</td>
-                                <!-- Add more columns based on your CarInventory table structure -->                        
-                                <td><button type="button" class="edit-button" onclick="openModal('{{ row[0] }}', '{{ row[1] }}', '{{ row[2] }}', '{{ row[3] }}', '{{ row[4] }}', '{{ row[5] }}', '{{ row[6] }}')">Edit</button></td>
-                            </tr>
+                        <tr>
+                            <td><input type="checkbox" name="select_row" value="{{ row[0] }}"></td>
+                            <td>{{ row[0] }}</td>
+                            <td>{{ row[1] }}</td>
+                            <td>{{ row[2] }}</td>
+                            <td>{{ row[3] }}</td>
+                            <td>{{ row[4] }}</td>
+                            <td>{{ row[5] }}</td>
+                            <td>{{ row[6] }}</td>
+                            <!-- Add more columns based on your CarInventory table structure -->
+                            <td><button type="button" class="edit-button"
+                                    onclick="openModal('{{ row[0] }}', '{{ row[1] }}', '{{ row[2] }}', '{{ row[3] }}', '{{ row[4] }}', '{{ row[5] }}', '{{ row[6] }}')">Edit</button>
+                            </td>
+                        </tr>
                         {% endfor %}
                     </tbody>
                     <!-- Your table content goes here -->
@@ -65,10 +69,10 @@
                 <form id="edit-form" onsubmit="saveChanges(event)">
                     <label for="license-plate">License Plate:</label>
                     <input type="text" id="license-plate" name="license-plate" readonly>
-                
+
                     <label for="car-make">Car Make:</label>
                     <input type="text" id="car-make" name="car-make">
-                
+
                     <label for="car-model">Car Model:</label>
                     <input type="text" id="car-model" name="car-model">
 
@@ -99,4 +103,5 @@
     <script src="static/js/admin_dashboard.js"></script>
     <script src="static/js/admin_dashboard_edit.js"></script>
 </body>
+
 </html>

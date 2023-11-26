@@ -1,133 +1,146 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Metrics</title>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        
-        <!-- <link href="https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800&display=swap" rel="stylesheet"> -->
-        <link rel= "stylesheet" type= "text/css" href= "https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800&display=swap">
-        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/open-iconic-bootstrap.min.css') }}">
-        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/animate.css') }}">
-        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/owl.carousel.min.css') }}">
-        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/owl.theme.default.min.css') }}">
-        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/magnific-popup.css') }}">
-        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/aos.css') }}">
-        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/ionicons.min.css') }}">
-        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/bootstrap-datepicker.css') }}">
-        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/jquery.timepicker.css') }}">
-        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/flaticon.css') }}">
-        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/icomoon.css') }}">
-        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
 
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/admin_dashboard.css') }}">
-        <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-      </head>
+<head>
+    <title>Metrics</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- <link href="https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800&display=swap" rel="stylesheet"> -->
+    <link rel="stylesheet" type="text/css"
+        href="https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800&display=swap">
+    <link rel="stylesheet" type="text/css"
+        href="{{ url_for('static',filename='styles/open-iconic-bootstrap.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/animate.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/owl.carousel.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/owl.theme.default.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/magnific-popup.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/aos.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/ionicons.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/bootstrap-datepicker.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/jquery.timepicker.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/flaticon.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/icomoon.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/style.css') }}">
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/admin_dashboard.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+</head>
+
 <body>
     <div class="navbar">
         <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
         <a href="{{ url_for('manage_users') }}">Users</a>
-        <a href="{{ url_for('add_listing')}}" >Create Listings</a>
+        <a href="{{ url_for('add_listing')}}">Create Listings</a>
         <a href="{{ url_for('admin_metrics') }}" class="active">Metrics</a>
         <a href="{{ url_for('logout') }}">Logout</a>
     </div>
-       <section class="ftco-section ftco-no-pt bg-light">
-          <div class="container" style="padding-top: 100px;">
-              <div class="row no-gutters">
-                      <div class="row no-gutters mx-auto">
-                            <div class="container">
-                                <div class="services-wrap rounded-right w-100">
-                                    <h3 class="heading-section mb-4">Metrics</h3>
-                                <div class="row d-flex">
-                                    <div class="item">
-                                        <div class="testimony-wrap rounded text-center py-4 pb-5">
-                                            <div class="text pt-4" style="text-align: left";>
-                                                <div>
-                                                    <p>Cars in Inventory: <span style="color: black">{{ car_count }}</span></p>
-                                                </div>
-                                                <br>
-                                                <div>
-                                                    <p>Most Rented Car: <a href="/listing/{{ top_rented[0] }}" style="color: black; text-decoration: underline;">{{ top_rented[0] }}</a> ({{ top_rented[2] }} {{ top_rented[1] }})</p>
-                                                </div>
-                                                <br>
-                                                <div>
-                                                    <label for="monthSDropdown">View Monthly Sales:</label>
-                                                    <select id="monthSDropdown" onchange="updateMSValue()">
-                                                        <option>Select Month</option>
+    <section class="ftco-section ftco-no-pt bg-light">
+        <div class="container" style="padding-top: 100px;">
+            <div class="row no-gutters">
+                <div class="row no-gutters mx-auto">
+                    <div class="container">
+                        <div class="services-wrap rounded-right w-100">
+                            <h3 class="heading-section mb-4">Metrics</h3>
+                            <div class="row d-flex">
+                                <div class="item">
+                                    <div class="testimony-wrap rounded text-center py-4 pb-5">
+                                        <div class="text pt-4" style="text-align: left" ;>
+                                            <div>
+                                                <p>Cars in Inventory: <span style="color: black">{{ car_count }}</span>
+                                                </p>
+                                            </div>
+                                            <br>
+                                            <div>
+                                                <p>Most Rented Car: <a href="/listing/{{ top_rented[0] }}"
+                                                        style="color: black; text-decoration: underline;">{{
+                                                        top_rented[0] }}</a> ({{ top_rented[2] }} {{ top_rented[1] }})
+                                                </p>
+                                            </div>
+                                            <br>
+                                            <div>
+                                                <label for="monthSDropdown">View Monthly Sales:</label>
+                                                <select id="monthSDropdown" onchange="updateMSValue()">
+                                                    <option>Select Month</option>
                                                     {% for month in monthly_sales %}
-                                                        <option value="{{ month[0] }}" data-value="{{ month[1] }}">{{ month[0] }}</option>
+                                                    <option value="{{ month[0] }}" data-value="{{ month[1] }}">{{
+                                                        month[0] }}</option>
                                                     {% endfor %}
-                                                    </select>
-                                                    <p id="selectedMonthValue"></p>
-                                                </div>
-                                                <br>
-                                                <div>
-                                                    <label for="monthCDropdown">View Monthly Rentals:</label>
-                                                    <select id="monthCDropdown" onchange="updateMCValue()">
-                                                        <option>Select Month</option>
+                                                </select>
+                                                <p id="selectedMonthValue"></p>
+                                            </div>
+                                            <br>
+                                            <div>
+                                                <label for="monthCDropdown">View Monthly Rentals:</label>
+                                                <select id="monthCDropdown" onchange="updateMCValue()">
+                                                    <option>Select Month</option>
                                                     {% for month in monthly_count %}
-                                                        <option value="{{ month[0] }}" data-value="{{ month[1] }}">{{ month[0] }}</option>
+                                                    <option value="{{ month[0] }}" data-value="{{ month[1] }}">{{
+                                                        month[0] }}</option>
                                                     {% endfor %}
-                                                    </select>
-                                                    <p id="selectedMonthValue2"></p>
-                                                </div>
-                                                <br>
-                                                <div>
-                                                    <label for="yearSDropdown">View Yearly Sales:</label>
-                                                    <select id="yearSDropdown" onchange="updateYSValue()">
-                                                        <option>Select Year</option>
+                                                </select>
+                                                <p id="selectedMonthValue2"></p>
+                                            </div>
+                                            <br>
+                                            <div>
+                                                <label for="yearSDropdown">View Yearly Sales:</label>
+                                                <select id="yearSDropdown" onchange="updateYSValue()">
+                                                    <option>Select Year</option>
                                                     {% for year in yearly_sales %}
-                                                        <option value="{{ year[1] }}" data-value="{{ year[0] }}">{{ year[1] }}</option>
+                                                    <option value="{{ year[1] }}" data-value="{{ year[0] }}">{{ year[1]
+                                                        }}</option>
                                                     {% endfor %}
-                                                    </select>
-                                                    <p id="selectedYearValue"></p>
-                                                </div>
-                                                <br>
-                                                <div>
-                                                    <label for="yearCDropdown">View Yearly Rentals:</label>
-                                                    <select id="yearCDropdown" onchange="updateYCValue()">
-                                                        <option>Select Year</option>
+                                                </select>
+                                                <p id="selectedYearValue"></p>
+                                            </div>
+                                            <br>
+                                            <div>
+                                                <label for="yearCDropdown">View Yearly Rentals:</label>
+                                                <select id="yearCDropdown" onchange="updateYCValue()">
+                                                    <option>Select Year</option>
                                                     {% for year in yearly_count %}
-                                                        <option value="{{ year[1] }}" data-value="{{ year[0] }}">{{ year[1] }}</option>
+                                                    <option value="{{ year[1] }}" data-value="{{ year[0] }}">{{ year[1]
+                                                        }}</option>
                                                     {% endfor %}
-                                                    </select>
-                                                    <p id="selectedYearValue2"></p>
-                                                </div>                                             
+                                                </select>
+                                                <p id="selectedYearValue2"></p>
                                             </div>
                                         </div>
                                     </div>
-                              </div>
+                                </div>
                             </div>
                         </div>
                     </div>
+                </div>
             </div>
-      </section>
-    </body>
+    </section>
+</body>
 
-    <script>
-        function updateMSValue() {
-            var selectedOption = document.getElementById("monthSDropdown").options[document.getElementById("monthSDropdown").selectedIndex];
-            var selectedValue = selectedOption.getAttribute("data-value");
-        
-            document.getElementById("selectedMonthValue").innerText = "Monthly Sales (S$): " + selectedValue;
-        }
-        function updateMCValue() {
-            var selectedOption = document.getElementById("monthCDropdown").options[document.getElementById("monthCDropdown").selectedIndex];
-            var selectedValue = selectedOption.getAttribute("data-value");
-        
-            document.getElementById("selectedMonthValue2").innerText = "Monthly Rentals: " + selectedValue;
-        }
-        function updateYSValue() {
-            var selectedOption = document.getElementById("yearSDropdown").options[document.getElementById("yearSDropdown").selectedIndex];
-            var selectedValue = selectedOption.getAttribute("data-value");
-        
-            document.getElementById("selectedYearValue").innerText = "Yearly Sales (S$): " + selectedValue;
-        }
-        function updateYCValue() {
-            var selectedOption = document.getElementById("yearCDropdown").options[document.getElementById("yearCDropdown").selectedIndex];
-            var selectedValue = selectedOption.getAttribute("data-value");
-        
-            document.getElementById("selectedYearValue2").innerText = "Yearly Rentals: " + selectedValue;
-        }
-      </script>
+<script>
+    function updateMSValue() {
+        var selectedOption = document.getElementById("monthSDropdown").options[document.getElementById("monthSDropdown").selectedIndex];
+        var selectedValue = selectedOption.getAttribute("data-value");
+
+        document.getElementById("selectedMonthValue").innerText = "Monthly Sales (S$): " + selectedValue;
+    }
+    function updateMCValue() {
+        var selectedOption = document.getElementById("monthCDropdown").options[document.getElementById("monthCDropdown").selectedIndex];
+        var selectedValue = selectedOption.getAttribute("data-value");
+
+        document.getElementById("selectedMonthValue2").innerText = "Monthly Rentals: " + selectedValue;
+    }
+    function updateYSValue() {
+        var selectedOption = document.getElementById("yearSDropdown").options[document.getElementById("yearSDropdown").selectedIndex];
+        var selectedValue = selectedOption.getAttribute("data-value");
+
+        document.getElementById("selectedYearValue").innerText = "Yearly Sales (S$): " + selectedValue;
+    }
+    function updateYCValue() {
+        var selectedOption = document.getElementById("yearCDropdown").options[document.getElementById("yearCDropdown").selectedIndex];
+        var selectedValue = selectedOption.getAttribute("data-value");
+
+        document.getElementById("selectedYearValue2").innerText = "Yearly Rentals: " + selectedValue;
+    }
+</script>
+
 </html>

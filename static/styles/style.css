@@ -14341,24 +14341,24 @@ textarea.form-control {
 
 
 /* STARS STARS STARS */
-.center{
+.center {
   position: absolute;
   top: 45%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
-.center .stars{
+.center .stars {
   height: 150px;
   width: 500px;
   text-align: center;
 }
 
-.stars input{
+.stars input {
   display: none;
 }
 
-.stars label{
+.stars label {
   float: right;
   font-size: 50px;
   color: lightgrey;
@@ -14366,22 +14366,22 @@ textarea.form-control {
   text-shadow: 1px 1px #bbb;
 }
 
-.stars label:before{
+.stars label:before {
   content: '★';
 }
 
-.stars input:checked ~label{
+.stars input:checked~label {
   color: gold;
   text-shadow: 1px 1px #c60;
 }
 
-.stars:not(:checked) > label:hover,
-.stars:not(:checked) > label:hover ~ label{
+.stars:not(:checked)>label:hover,
+.stars:not(:checked)>label:hover~label {
   color: gold;
 }
 
-.stars input:checked > label:hover,
-.stars input:checked > label:hover ~ label{
+.stars input:checked>label:hover,
+.stars input:checked>label:hover~label {
   color: gold;
   text-shadow: 1px 1px goldenrod;
 }
